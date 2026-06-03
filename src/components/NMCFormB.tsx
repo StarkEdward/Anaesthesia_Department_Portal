@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { jsPDF } from 'jspdf';
 import { toJpeg } from 'html-to-image';
-import { Printer, Download, Plus, Trash2, Users, X, Search, ListPlus } from 'lucide-react';
+import { Printer, Download, Plus, Trash2, Users, X, Search, ListPlus, Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { db } from '../firebase';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -225,10 +226,15 @@ const renderFormattedItemText = (text: string) => {
 export default function NMCFormB() {
   const printRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isFetching, setIsFetching] = useState(!!id);
 
   const useAutoSaveState = <T,>(key: string, initialValue: T) => {
     const [state, setState] = useState<T>(() => {
-      const saved = localStorage.getItem(`nmc_form_b_full_${key}`);
+      const storageKey = `nmc_form_b_${id || 'new'}_${key}`;
+      const saved = localStorage.getItem(storageKey);
       if (!saved) return initialValue;
       try {
         const parsed = JSON.parse(saved);
@@ -411,9 +417,12 @@ export default function NMCFormB() {
         return initialValue;
       }
     });
+
     useEffect(() => {
-      localStorage.setItem(`nmc_form_b_full_${key}`, JSON.stringify(state));
-    }, [key, state]);
+      const storageKey = `nmc_form_b_${id || 'new'}_${key}`;
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }, [key, state, id]);
+
     return [state, setState] as const;
   };
 
@@ -695,6 +704,85 @@ export default function NMCFormB() {
   const [assessorRemarks, setAssessorRemarks] = useAutoSaveState('assessorRemarks', '');
   const [miscData, setMiscData] = useAutoSaveState('miscData', { govt: '', national: '', other: '', defic: '' });
 
+  useEffect(() => {
+    if (!id) {
+      setIsFetching(false);
+      return;
+    }
+    
+    const loadRecord = async () => {
+      try {
+        const docRef = doc(db, 'nmc_form_b', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setGenDetails(data.genDetails || genDetails);
+          setUnitBeds(data.unitBeds || unitBeds);
+          setPgInspections(data.pgInspections || pgInspections);
+          setOtherCourses(data.otherCourses || otherCourses);
+          setInfra(data.infra || infra);
+          setOpdAreas(data.opdAreas || opdAreas);
+          setJournals(data.journals || journals);
+          setEquipments(data.equipments || equipments);
+          setIcus(data.icus || icus);
+          setIcuEquips(data.icuEquips || icuEquips);
+          setOtherIcuEquips(data.otherIcuEquips || otherIcuEquips);
+          setHduEquips(data.hduEquips || hduEquips);
+          setOtherHduEquips(data.otherHduEquips || otherHduEquips);
+          setClinics(data.clinics || clinics);
+          setClinicalMats(data.clinicalMats || clinicalMats);
+          setUnitFaculties(data.unitFaculties || unitFaculties);
+          setStaffUnitNo(data.staffUnitNo || staffUnitNo);
+          setEligibleFaculties(data.eligibleFaculties || eligibleFaculties);
+          setPgStudents(data.pgStudents || pgStudents);
+          setPastPgStudents(data.pastPgStudents || pastPgStudents);
+          setAcademicActivities(data.academicActivities || academicActivities);
+          setPublicationsList(data.publicationsList || publicationsList);
+          setFormativeAssessment(data.formativeAssessment || formativeAssessment);
+          setExternalExaminers(data.externalExaminers || externalExaminers);
+          setInternalExaminers(data.internalExaminers || internalExaminers);
+          setExamStudents(data.examStudents || examStudents);
+          setExamDetails(data.examDetails || examDetails);
+          setAssessorRemarks(data.assessorRemarks || assessorRemarks);
+          setMiscData(data.miscData || miscData);
+        }
+      } catch (err) {
+        console.error("Error loading record:", err);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+    
+    loadRecord();
+  }, [id]);
+
+  const handleSaveRecord = async () => {
+    setIsSaving(true);
+    try {
+      const recordId = id || Math.random().toString(36).substring(2, 10);
+      const docRef = doc(db, 'nmc_form_b', recordId);
+      
+      const payload = {
+        id: recordId,
+        genDetails, unitBeds, pgInspections, otherCourses, infra, opdAreas, journals, equipments, icus, icuEquips, otherIcuEquips, hduEquips, otherHduEquips, clinics, clinicalMats, unitFaculties, staffUnitNo, eligibleFaculties, pgStudents, pastPgStudents, academicActivities, publicationsList, formativeAssessment, externalExaminers, internalExaminers, examStudents, examDetails, assessorRemarks, miscData,
+        updatedAt: serverTimestamp(),
+        ...(id ? {} : { createdAt: serverTimestamp() })
+      };
+      
+      await setDoc(docRef, payload, { merge: true });
+      
+      if (!id) {
+        navigate(`/nmc-form-b/${recordId}`, { replace: true });
+      }
+      alert('Record saved successfully!');
+    } catch (err: any) {
+      console.error(err);
+      alert('Failed to save record: ' + err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const addRow = (setState: any, createNew: () => any) => setState((prev: any[]) => [...prev, createNew()]);
   const removeRow = (setState: any, id: string) => setState((prev: any[]) => prev.filter(item => item.id !== id));
   const updateRow = (setState: any, id: string, field: string, value: string) => setState((prev: any[]) => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
@@ -879,16 +967,47 @@ export default function NMCFormB() {
     setShowDoctorModal(false);
   };
 
+  if (isFetching) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+        <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+        <h2 className="text-xl font-semibold text-slate-800">Loading Form B Record...</h2>
+        <p className="text-slate-500 mt-2 text-center max-w-md">Retrieving your standard inspection format data.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full bg-slate-50 text-slate-900 flex flex-col font-sans">
       <main className="flex-1 flex flex-col relative overflow-hidden">
         
         <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
           <div>
-            <h1 className="text-xl font-bold text-slate-800">NMC FORM B - Anaesthesiology (Complete)</h1>
-            <p className="text-sm text-slate-500">Auto-saves locally. High-resolution PDF export with mixed Portrait/Landscape.</p>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => navigate('/nmc-form-b')}
+                className="p-2 -ml-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
+                title="Back to Hub"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <h1 className="text-xl font-bold text-slate-800">
+                NMC FORM B - Anaesthesiology {id ? '(Editing)' : '(New)'}
+              </h1>
+            </div>
+            <p className="text-sm text-slate-500 ml-11">Auto-saves locally. Use Save Record to persist to cloud.</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={handleSaveRecord}
+              disabled={isSaving}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors ${
+                isSaving ? 'bg-blue-400 text-white cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+              <span>{isSaving ? 'Saving...' : 'Save Record'}</span>
+            </button>
             <button onClick={() => {
               if (window.confirm("Are you sure you want to reset all form data? This will clear all your typed inputs.")) {
                 localStorage.clear();

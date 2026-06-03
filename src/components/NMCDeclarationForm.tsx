@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Printer, Download, Upload, FileText, Loader2 } from "lucide-react";
+import { Printer, Download, Upload, FileText, Loader2, Save, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toJpeg } from "html-to-image";
 import jsPDF from "jspdf";
 import * as mammoth from "mammoth";
+import { useParams, useNavigate } from 'react-router-dom';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+
 import Page1 from "./Page1";
 import Page2 from "./Page2";
 import Page3 from "./Page3";
@@ -19,12 +23,16 @@ import { AutoFillLoadingOverlay } from "./AutoFillLoadingOverlay";
 import { FormProvider, useFormContext } from "../context/FormContext";
 
 function NMCDeclarationFormInner() {
-  const { formData } = useFormContext();
+  const { formData, setFormData } = useFormContext();
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<"print" | "pdf" | null>(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!id);
   const [toastMessage, setToastMessage] = useState<{
     text: string;
     type: "success" | "error" | "info";
@@ -74,6 +82,52 @@ function NMCDeclarationFormInner() {
       document.removeEventListener("input", handleInput);
     };
   }, []);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    const loadRecord = async () => {
+      try {
+        const docRef = doc(db, 'nmc_declarations', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.formData) {
+             setFormData(data.formData);
+          }
+          if (data.uncontrolledFields) {
+             setTimeout(() => {
+               const formElements = Array.from(
+                 document.querySelectorAll(
+                   'input:not([type="hidden"]):not([type="file"]), textarea, select',
+                 ),
+               ) as (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[];
+
+               formElements.forEach((el, i) => {
+                 const key = i.toString();
+                 if (key in data.uncontrolledFields) {
+                   const savedValue = data.uncontrolledFields[key];
+                   if (el.type === "checkbox" || el.type === "radio") {
+                     (el as HTMLInputElement).checked = savedValue as boolean;
+                   } else {
+                     el.value = savedValue as string;
+                   }
+                   el.dispatchEvent(new Event("change", { bubbles: true }));
+                   el.dispatchEvent(new Event("input", { bubbles: true }));
+                 }
+               });
+             }, 500);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading record:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadRecord();
+  }, [id, setFormData]);
 
   const validateForm = () => {
     const required = [
@@ -177,15 +231,10 @@ function NMCDeclarationFormInner() {
 
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i] as HTMLElement;
-
-        // Ensure fonts are loaded and layout is stable
         await new Promise((r) => setTimeout(r, 300));
-
         const imgWidth = 210;
         const pageHeightMm = (page.offsetHeight * 210) / page.offsetWidth;
-        // Use standard A4 height unless content overflows
         const imgHeight = Math.max(297, pageHeightMm);
-
         const dataUrl = await toJpeg(page, {
           quality: 0.85,
           pixelRatio: 1.5,
@@ -198,9 +247,7 @@ function NMCDeclarationFormInner() {
             margin: "0",
           },
         });
-
         if (i === 0) {
-          // Adjust first page size if needed
           if (imgHeight > 297) {
             pdf.deletePage(1);
             pdf.addPage([imgWidth, imgHeight]);
@@ -208,37 +255,21 @@ function NMCDeclarationFormInner() {
         } else {
           pdf.addPage([imgWidth, imgHeight]);
         }
-
-        pdf.addImage(
-          dataUrl,
-          "JPEG",
-          0,
-          0,
-          imgWidth,
-          imgHeight,
-          undefined,
-          "FAST",
-        );
+        pdf.addImage(dataUrl, "JPEG", 0, 0, imgWidth, imgHeight, undefined, "FAST");
       }
-
       const cleanTitle = selectedTitle.replace(/\//g, "-").replace(/\s+/g, " ").trim();
       let fileName = `${cleanTitle} Declaration Form.pdf`;
       const firstNameInput = document.getElementById("faculty-first-name") as HTMLInputElement;
       const lastNameInput = document.getElementById("faculty-last-name") as HTMLInputElement;
-      
       const firstName = firstNameInput?.value?.trim() || "";
       const lastName = lastNameInput?.value?.trim() || "";
-      
       if (firstName || lastName) {
         fileName = `${cleanTitle} Declaration Form Dr. ${firstName} ${lastName}.pdf`;
       }
-
       pdf.save(fileName.replace(/\s+/g, " "));
     } catch (error) {
       console.error("Error generating PDF:", error);
-      alert(
-        "Failed to generate PDF. Try using the regular Print option or wait a moment and try again.",
-      );
+      alert("Failed to generate PDF. Try using the regular Print option or wait a moment and try again.");
     } finally {
       dateInputStates.forEach(({ el, originalValue }) => {
         el.type = "date";
@@ -253,22 +284,67 @@ function NMCDeclarationFormInner() {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
+  const handleSaveRecord = async () => {
+    setIsSaving(true);
     try {
-      // Build a schema of all visible form elements
       const formElements = Array.from(
         document.querySelectorAll(
           'input:not([type="hidden"]):not([type="file"]), textarea, select',
         ),
       ) as (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[];
+      
+      const uncontrolledFields: Record<string, string | boolean> = {};
+      formElements.forEach((el, i) => {
+        if (el.type === "checkbox" || el.type === "radio") {
+          uncontrolledFields[i.toString()] = (el as HTMLInputElement).checked;
+        } else {
+          uncontrolledFields[i.toString()] = el.value;
+        }
+      });
 
+      const recordId = id || Math.random().toString(36).substring(2, 10);
+      const docRef = doc(db, 'nmc_declarations', recordId);
+      
+      await setDoc(docRef, {
+        id: recordId,
+        facultyNameFirst: formData.facultyNameFirst,
+        facultyNameMiddle: formData.facultyNameMiddle,
+        facultyNameLast: formData.facultyNameLast,
+        designation: formData.designation,
+        department: formData.department,
+        formData,
+        uncontrolledFields,
+        updatedAt: serverTimestamp(),
+        ...(id ? {} : { createdAt: serverTimestamp() })
+      }, { merge: true });
+
+      setToastMessage({ type: "success", text: "Record saved successfully!" });
+      setTimeout(() => setToastMessage(null), 3000);
+      
+      if (!id) {
+        navigate(`/declaration/${recordId}`, { replace: true });
+      }
+    } catch (err: any) {
+      console.error(err);
+      setToastMessage({ type: "error", text: "Failed to save record" });
+      setTimeout(() => setToastMessage(null), 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const formElements = Array.from(
+        document.querySelectorAll(
+          'input:not([type="hidden"]):not([type="file"]), textarea, select',
+        ),
+      ) as (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[];
       const formSchema = formElements.map((el, i) => {
         el.setAttribute("data-af-id", i.toString());
-
         let labelText = "";
         const id = el.id;
         if (id) {
@@ -276,17 +352,11 @@ function NMCDeclarationFormInner() {
           if (label) labelText = label.textContent || "";
         }
         if (!labelText && el.parentElement) {
-          labelText = el.parentElement.innerText
-            ?.replace(/\s+/g, " ")
-            .substring(0, 100);
-            
+          labelText = el.parentElement.innerText?.replace(/\s+/g, " ").substring(0, 100);
           if (el.parentElement.parentElement && labelText.length < 30) {
-            labelText = el.parentElement.parentElement.innerText
-              ?.replace(/\s+/g, " ")
-              .substring(0, 150) + " " + labelText;
+            labelText = el.parentElement.parentElement.innerText?.replace(/\s+/g, " ").substring(0, 150) + " " + labelText;
           }
         }
-
         return {
           id: i.toString(),
           type: el.type || el.tagName.toLowerCase(),
@@ -294,15 +364,11 @@ function NMCDeclarationFormInner() {
           context: labelText.trim(),
           value: el.value,
           placeholder: el.getAttribute("placeholder") || undefined,
-          options: el.tagName === "SELECT" 
-            ? Array.from((el as HTMLSelectElement).options).map(o => o.value)
-            : undefined
+          options: el.tagName === "SELECT" ? Array.from((el as HTMLSelectElement).options).map(o => o.value) : undefined
         };
       });
-
       const payload = new FormData();
       payload.append("formSchema", JSON.stringify(formSchema));
-      
       const tableElements = Array.from(document.querySelectorAll('[data-af-table]'));
       const tableSchemas = tableElements.map(el => {
           const tableName = el.getAttribute('data-af-table');
@@ -313,18 +379,13 @@ function NMCDeclarationFormInner() {
       if (tableSchemas.length > 0) {
           payload.append("tableSchemas", JSON.stringify(tableSchemas));
       }
-      
       if (file.name.toLowerCase().endsWith(".doc")) {
-        setToastMessage({
-          text: "Old .doc format is not supported. Please save your file as .docx or .pdf and try again.",
-          type: "error",
-        });
+        setToastMessage({ text: "Old .doc format is not supported. Please save your file as .docx or .pdf and try again.", type: "error" });
         setTimeout(() => setToastMessage(null), 6000);
         setIsUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
-      
       if (file.name.toLowerCase().endsWith(".pdf")) {
         payload.append("file", file, file.name);
       } else {
@@ -332,37 +393,16 @@ function NMCDeclarationFormInner() {
         const result = await mammoth.convertToHtml({ arrayBuffer });
         payload.append("documentHtml", result.value);
       }
-
-      const response = await fetch("/api/autofill", {
-        method: "POST",
-        body: payload,
-      });
-
+      const response = await fetch("/api/autofill", { method: "POST", body: payload });
       let data;
       try {
         const text = await response.text();
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          if (!response.ok) {
-            throw new Error(text.substring(0, 100));
-          }
-          throw new Error("Failed to parse server response as JSON");
-        }
-      } catch (err: any) {
-        throw new Error(err.message || "Failed to process server response");
-      }
-
-      if (!response.ok) {
-        throw new Error(data?.error || `Status ${response.status}`);
-      }
-
-      // Apply extracted fields directly to the DOM to support thousands of uncontrolled inputs
+        try { data = JSON.parse(text); } catch (e) { if (!response.ok) throw new Error(text.substring(0, 100)); throw new Error("Failed to parse server response as JSON"); }
+      } catch (err: any) { throw new Error(err.message || "Failed to process server response"); }
+      if (!response.ok) throw new Error(data?.error || `Status ${response.status}`);
       if (data.data && Array.isArray(data.data.fields)) {
         data.data.fields.forEach((field: any) => {
-          const el = document.querySelector(
-            `[data-af-id="${field.id}"]`,
-          ) as any;
+          const el = document.querySelector(`[data-af-id="${field.id}"]`) as any;
           if (el) {
             if (el.type === "checkbox" || el.type === "radio") {
               if (field.value === "true" || field.value === true) {
@@ -370,70 +410,50 @@ function NMCDeclarationFormInner() {
                 el.dispatchEvent(new Event("change", { bubbles: true }));
               }
             } else {
-              const isReactInput = Object.keys(el).some((k) =>
-                k.startsWith("__reactProps"),
-              );
-              // Set Native value to bypass React optimization and trigger updates
-              const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLInputElement.prototype,
-                "value",
-              )?.set;
-              const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLTextAreaElement.prototype,
-                "value",
-              )?.set;
-              const nativeSelectValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLSelectElement.prototype,
-                "value",
-              )?.set;
-
+              const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
+              const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value")?.set;
+              const nativeSelectValueSetter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value")?.set;
               let setter = nativeInputValueSetter;
               if (el.tagName === "TEXTAREA") setter = nativeTextAreaValueSetter;
               if (el.tagName === "SELECT") setter = nativeSelectValueSetter;
-
               if (setter) {
                 setter.call(el, field.value);
                 el.dispatchEvent(new Event("input", { bubbles: true }));
                 el.dispatchEvent(new Event("change", { bubbles: true }));
-              } else {
-                el.value = field.value;
-              }
+              } else { el.value = field.value; }
             }
           }
         });
       }
-
-      // Dispatch custom event if any specific React components need it (like Date auto-calculation)
       const fillEvent = new CustomEvent("autofill", { detail: data.data });
       document.dispatchEvent(fillEvent);
-
       setTimeout(() => {
-        setToastMessage({
-          text: "Application form filled successfully.",
-          type: "success",
-        });
+        setToastMessage({ text: "Application form filled successfully.", type: "success" });
         setTimeout(() => setToastMessage(null), 4000);
       }, 300);
     } catch (error: any) {
       console.error("Upload error:", error);
       let errorMsg = "Failed to extract data. Please try again.";
       if (error && error.message) {
-        if (error.message.includes("GEMINI")) {
-           errorMsg = "AI Autofill requires a GEMINI_API_KEY in your .env file to work.";
-        } else {
-           errorMsg = `Error: ${error.message}`;
-        }
+        if (error.message.includes("GEMINI")) errorMsg = "AI Autofill requires a GEMINI_API_KEY in your .env file to work.";
+        else errorMsg = `Error: ${error.message}`;
       }
-      setToastMessage({
-        text: errorMsg,
-        type: "error",
-      });
+      setToastMessage({ text: errorMsg, type: "error" });
       setTimeout(() => setToastMessage(null), 8000);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
+        <p className="text-gray-600 font-medium">Loading form data...</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -454,51 +474,15 @@ function NMCDeclarationFormInner() {
           >
             {toastMessage.type === "success" ? (
               <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={3}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
               </div>
             ) : toastMessage.type === "error" ? (
               <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={3}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </div>
             ) : (
               <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
-                <svg
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={3}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
             )}
             <span className="truncate">{toastMessage.text}</span>
@@ -508,8 +492,35 @@ function NMCDeclarationFormInner() {
       <AnimatePresence>
         {isUploading && <AutoFillLoadingOverlay />}
       </AnimatePresence>
+
+      <div className="sticky top-0 z-40 bg-gray-100 border-b border-gray-300 px-8 py-4 mb-6 shadow-sm">
+        <div className="max-w-[794px] mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => navigate('/declaration')}
+              className="flex items-center space-x-1 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft size={20} />
+              <span className="font-medium">Back to Hub</span>
+            </button>
+            <h1 className="text-xl font-bold text-gray-800 hidden sm:block">
+              {id ? 'Edit Declaration Form' : 'New Declaration Form'}
+            </h1>
+          </div>
+          <div className="flex space-x-4">
+            <button
+              onClick={handleSaveRecord}
+              disabled={isSaving || isGenerating}
+              className="flex items-center space-x-2 px-6 py-2.5 bg-indigo-600 text-white rounded font-bold text-sm shadow hover:bg-indigo-700 transition disabled:opacity-50"
+            >
+              {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+              <span>{isSaving ? "Saving..." : "Save Record"}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="nmc-form min-h-screen bg-gray-100 py-8 pb-28 print:py-0 print:bg-white font-serif text-black overflow-x-auto">
-        {/* Top Header - Hidden in Print/PDF */}
         <div className="text-center mb-8 print:hidden">
           <h2 className="text-2xl font-bold font-serif text-gray-800">
             Jannayak Birsa Munda Government Medical College Nandurbar
@@ -521,26 +532,20 @@ function NMCDeclarationFormInner() {
 
         <form id="pdf-content" onSubmit={(e) => e.preventDefault()}>
           <div className="a4-page bg-white">
-            {/* HEADER */}
             <div className="text-center pb-10 pt-4 flex flex-col items-center">
               <select
                 className="print-hidden mb-2 p-1 border border-gray-300 rounded text-sm font-sans bg-transparent cursor-pointer"
                 value={selectedTitle}
                 onChange={(e) => setSelectedTitle(e.target.value)}
               >
-                <option value="Faculty/ SR/ Tutor/ JR/ Demonstrator">
-                  Show All (Faculty/ SR/ Tutor/ JR/ Demonstrator)
-                </option>
+                <option value="Faculty/ SR/ Tutor/ JR/ Demonstrator">Show All (Faculty/ SR/ Tutor/ JR/ Demonstrator)</option>
                 <option value="Faculty">Faculty</option>
                 <option value="SR">SR</option>
                 <option value="Tutor">Tutor</option>
                 <option value="JR">JR</option>
                 <option value="Demonstrator">Demonstrator</option>
               </select>
-              <h1
-                className="text-[26px] font-bold font-serif tracking-normal"
-                style={{ fontFamily: '"Times New Roman", Times, serif' }}
-              >
+              <h1 className="text-[26px] font-bold font-serif tracking-normal" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
                 {selectedTitle} Declaration Form
               </h1>
             </div>
@@ -549,44 +554,32 @@ function NMCDeclarationFormInner() {
 
           <div className="a4-page bg-white relative">
             <Page2 />
-            <div className="absolute bottom-6 right-8 text-sm font-serif">
-              2
-            </div>
+            <div className="absolute bottom-6 right-8 text-sm font-serif">2</div>
           </div>
 
           <div className="a4-page bg-white relative">
             <Page3 />
-            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">
-              3
-            </div>
+            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">3</div>
           </div>
 
           <div className="a4-page bg-white relative">
             <Page4 />
-            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">
-              4
-            </div>
+            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">4</div>
           </div>
 
           <div className="a4-page bg-white relative">
             <Page5 />
-            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">
-              5
-            </div>
+            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">5</div>
           </div>
 
           <div className="a4-page bg-white relative">
             <Page6 />
-            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">
-              6
-            </div>
+            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">6</div>
           </div>
 
           <div className="a4-page bg-white relative">
             <Page7 />
-            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">
-              7
-            </div>
+            <div className="absolute bottom-6 right-8 text-sm font-bold font-serif">7</div>
           </div>
 
           <div className="a4-page bg-white relative">

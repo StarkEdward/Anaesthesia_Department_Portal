@@ -13,6 +13,10 @@ import Dashboard from './components/Dashboard';
 import PAC from './components/PAC';
 import Doctors from './components/Doctors';
 import NMCDeclarationForm from './components/NMCDeclarationForm';
+import NMCDeclarationHub from './components/NMCDeclarationHub';
+
+import NMCFormB from './components/NMCFormB';
+import NMCFormBHub from './components/NMCFormBHub';
 import Inventory from './components/Inventory';
 import Transactions from './components/Transactions';
 import Library from './components/Library';
@@ -22,7 +26,7 @@ import AttendanceSystem from './components/AttendanceSystem';
 import Reports from './components/Reports';
 import Users from './components/Users';
 import Profile from './components/Profile';
-import NMCFormB from './components/NMCFormB';
+
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
   const { user, role, loading } = useAuth();
@@ -79,13 +83,21 @@ export default function App() {
               <Route path="/" element={<ProtectedRoute><MainLayout><Dashboard /></MainLayout></ProtectedRoute>} />
               <Route path="/pac" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'nurse']}><MainLayout><PAC /></MainLayout></ProtectedRoute>} />
               <Route path="/doctors" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><Doctors /></MainLayout></ProtectedRoute>} />
-              <Route path="/declaration" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCDeclarationForm /></MainLayout></ProtectedRoute>} />
+              
+              <Route path="/declaration" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCDeclarationHub /></MainLayout></ProtectedRoute>} />
+              <Route path="/declaration/new" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCDeclarationForm /></MainLayout></ProtectedRoute>} />
+              <Route path="/declaration/:id" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCDeclarationForm /></MainLayout></ProtectedRoute>} />
+              
               <Route path="/inventory" element={<ProtectedRoute allowedRoles={['admin', 'nurse', 'clerk']}><MainLayout><Inventory /></MainLayout></ProtectedRoute>} />
               <Route path="/transactions" element={<ProtectedRoute allowedRoles={['admin', 'nurse', 'clerk']}><MainLayout><Transactions /></MainLayout></ProtectedRoute>} />
               <Route path="/library" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><Library /></MainLayout></ProtectedRoute>} />
               <Route path="/leave" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><LeaveApplication /></MainLayout></ProtectedRoute>} />
               <Route path="/official-leave" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><OfficialLeaveLetter /></MainLayout></ProtectedRoute>} />
-              <Route path="/nmc-form-b" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormB /></MainLayout></ProtectedRoute>} />
+              
+              <Route path="/nmc-form-b" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormBHub /></MainLayout></ProtectedRoute>} />
+              <Route path="/nmc-form-b/new" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormB /></MainLayout></ProtectedRoute>} />
+              <Route path="/nmc-form-b/:id" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormB /></MainLayout></ProtectedRoute>} />
+              
               <Route path="/attendance" element={<ProtectedRoute allowedRoles={['admin', 'clerk', 'doctor']}><MainLayout><AttendanceSystem /></MainLayout></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><MainLayout><Reports /></MainLayout></ProtectedRoute>} />
               <Route path="/users" element={<ProtectedRoute allowedRoles={['admin']}><MainLayout><Users /></MainLayout></ProtectedRoute>} />

@@ -199,6 +199,16 @@ service cloud.firestore {
       allow write: if isClerk() || isAdmin();
     }
 
+    match /nmc_declarations/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isDoctor() || isClerk();
+    }
+
+    match /nmc_form_b/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isDoctor() || isClerk();
+    }
+
     match /library/{bookId} {
       allow read: if isAuthenticated();
       allow write: if isClerk() || isDoctor() || isAdmin();
