@@ -817,6 +817,14 @@ export default function NMCFormB() {
       document.body.appendChild(tempContainer);
 
       clone.querySelectorAll('.no-print').forEach(el => { (el as HTMLElement).style.display = 'none'; });
+      
+      // Explicitly remove input underlines for PDF generation
+      clone.querySelectorAll('.border-b.border-black').forEach(el => {
+        if (!el.classList.contains('border-t') && el.tagName !== 'TABLE' && el.tagName !== 'TH' && el.tagName !== 'TD') {
+          el.classList.remove('border-b', 'border-black');
+        }
+      });
+
       clone.querySelectorAll('input, textarea, select').forEach(input => {
         const el = input as HTMLInputElement | HTMLTextAreaElement;
         const div = document.createElement('div');
