@@ -1931,9 +1931,9 @@ export default function NMCFormB() {
                   <tr>
                     <th className="w-24">Number on<br/>day of<br/>assessment</th>
                     <th className="w-24">Previous day<br/>data</th>
-                    <th className="w-20">Year1</th>
-                    <th className="w-20">Year2</th>
-                    <th className="w-24">Year3 (last<br/>year)</th>
+                    <th className="w-20">Year1<br/><span className="font-normal text-[8pt]">(2023)</span></th>
+                    <th className="w-20">Year2<br/><span className="font-normal text-[8pt]">(2024)</span></th>
+                    <th className="w-24">Year3 (last<br/>year)<br/><span className="font-normal text-[8pt]">(2025)</span></th>
                   </tr>
                 </thead>
                 <tbody>
