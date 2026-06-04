@@ -2455,7 +2455,7 @@ export default function NMCFormB() {
               </div>
             </div>
 
-            <div className="absolute bottom-[30mm] left-[12.7mm] right-[12.7mm] flex justify-between text-[11pt] font-bold">
+            <div className="flex justify-between text-[11pt] font-bold mt-20 px-8">
               <div className="flex">
                 <span className="w-16">Date:</span>
                 <span className="border-b border-black w-32">&nbsp;</span>
