@@ -777,7 +777,6 @@ export default function NMCFormB() {
       if (!id) {
         navigate(`/nmc-form-b/${recordId}`, { replace: true });
       }
-      setLastSaved(new Date().toLocaleString());
       showToast('Record saved successfully!', 'success');
     } catch (err: any) {
       console.error(err);
