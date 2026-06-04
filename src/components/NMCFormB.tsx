@@ -1441,7 +1441,7 @@ export default function NMCFormB() {
               <button className="no-print text-indigo-600 text-sm mb-2 ml-4 flex items-center" onClick={()=>addRow(setEquipments, ()=>({id:generateId(), name:'', available:'', functional:'', specs:'', adequate:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
 
               <p className="font-bold mb-2 mt-4 flex"><span className="w-8">h.</span><span>Intensive care facilities under Anaesthesia department</span></p>
-              <table className="nmc-table tight-table text-[9.5pt] w-[95%] ml-4 mb-4">
+              <table className="nmc-table tight-table text-[9.5pt] w-[95%] ml-4 mb-2">
                 <thead>
                   <tr>
                     <th rowSpan={2} className="w-1/4">Name of ICU</th>
@@ -1477,7 +1477,7 @@ export default function NMCFormB() {
             <PageHeader pageNum={5} />
             <div className="pl-12 w-full text-[10.5pt] mt-3">
               <p className="font-bold mb-2 flex"><span className="w-8">i.</span><span>Equipment in ICU (Required with each Intensive Care Unit Bed)</span></p>
-              <table className="nmc-table tight-table text-[9.5pt] w-full mb-4">
+              <table className="nmc-table tight-table text-[9.5pt] w-full mb-2">
                 <thead><tr><th className="w-[45%]">Item</th><th className="w-16">Number</th><th className="w-20">Available/Not<br/>Available</th><th className="w-20">Functional<br/>Status</th><th>Remarks</th></tr></thead>
                 <tbody>
                   {icuEquips.map((eq, idx) => {
@@ -1518,14 +1518,14 @@ export default function NMCFormB() {
                 </tbody>
               </table>
               <button 
-                className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
+                className="no-print text-indigo-600 text-sm mb-2 flex items-center" 
                 onClick={() => addRow(setIcuEquips, () => ({ id: generateId(), item: '', num: '', available: '', functional: '', remarks: '' }))}
               >
                 <Plus className="w-4 h-4 mr-1"/> Add Record
               </button>
 
               <p className="font-bold mb-2 mt-4 flex"><span className="w-8">j.</span><span>Other Equipment required in the ICU Facility</span></p>
-              <table className="nmc-table tight-table text-[9.5pt] w-full mb-4">
+              <table className="nmc-table tight-table text-[9.5pt] w-full mb-2">
                 <thead><tr><th className="w-[45%]">Item</th><th className="w-16">Number</th><th className="w-20">Available/Not<br/>Available</th><th className="w-20">Functional<br/>Status</th><th>Remarks</th></tr></thead>
                 <tbody>
                   {otherIcuEquips.map((eq, idx) => {
@@ -1566,7 +1566,7 @@ export default function NMCFormB() {
                 </tbody>
               </table>
               <button 
-                className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
+                className="no-print text-indigo-600 text-sm mb-2 flex items-center" 
                 onClick={() => addRow(setOtherIcuEquips, () => ({ id: generateId(), item: '', num: '', available: '', functional: '', remarks: '' }))}
               >
                 <Plus className="w-4 h-4 mr-1"/> Add Record
@@ -1650,7 +1650,7 @@ export default function NMCFormB() {
                   </tbody>
                 </table>
                 <button 
-                  className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
+                  className="no-print text-indigo-600 text-sm mb-2 flex items-center" 
                   onClick={() => addRow(setHduEquips, () => ({ id: generateId(), item: '', num: '', available: '', functional: '', remarks: '' }))}
                 >
                   <Plus className="w-4 h-4 mr-1"/> Add Record
@@ -1659,7 +1659,7 @@ export default function NMCFormB() {
 
               <div>
                 <p className="font-bold mb-2 flex"><span className="w-8">l.</span><span>Other Equipment required in the HDU/Step down ICU Facility</span></p>
-                <table className="nmc-table tight-table text-[9.5pt] w-full mb-4">
+                <table className="nmc-table tight-table text-[9.5pt] w-full mb-2">
                   <thead>
                     <tr><th className="w-[40%]">Item</th><th className="w-16">Number</th><th className="w-24">Available/Not<br/>Available</th><th className="w-20">Functional<br/>Status</th><th>Remarks</th></tr>
                   </thead>
@@ -1770,7 +1770,7 @@ export default function NMCFormB() {
                 </tbody>
               </table>
               <button 
-                className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
+                className="no-print text-indigo-600 text-sm mb-2 flex items-center" 
                 onClick={() => addRow(setClinics, () => ({ id: generateId(), name: '', days: '', timings: '', cases: '', incharge: '' }))}
               >
                 <Plus className="w-4 h-4 mr-1"/> Add Record
@@ -1921,7 +1921,7 @@ export default function NMCFormB() {
                 </table>
                 {/* Show Add Record + Import Doctors only on the last faculty page */}
                 {ci === facultyChunks.length - 1 && (
-                  <div className="no-print flex gap-3 mt-2 items-center">
+                  <div className="no-print flex gap-3 mt-1 items-center">
                     <button
                       className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
                       onClick={() => setUnitFaculties(prev => [...prev, {
@@ -1958,7 +1958,7 @@ export default function NMCFormB() {
               <span className="w-8">ii.</span>
               <span className="text-justify">Total eligible faculties and Senior Residents (fulfilling the TEQ requirement, attendance requirement and other requirements prescribed by NMC from time-to-time) available in the department:</span>
             </p>
-            <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-8">
+            <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-2">
               <thead>
                 <tr>
                   <th className="w-32 text-left pl-2">Designation</th>
@@ -2007,7 +2007,7 @@ export default function NMCFormB() {
               </tbody>
             </table>
             
-            <div className="no-print flex gap-3 mt-2 ml-8 mb-8 items-center">
+            <div className="no-print flex gap-3 mt-1 ml-8 mb-2 items-center">
               <button
                 className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
                 onClick={() => setEligibleFaculties(prev => [...prev, { id: generateId(), designation: '', num: '', name: '', seats: '', adequate: '' }])}
@@ -2020,7 +2020,7 @@ export default function NMCFormB() {
               <span className="w-8">iii.</span>
               <span>P.G students presently studying in the Department:</span>
             </p>
-            <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-6">
+            <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-2">
               <thead>
                 <tr><th className="w-48">Name</th><th className="w-32">Joining date</th><th className="w-32">Phone No</th><th>E-mail</th><th className="w-10 no-print"></th></tr>
               </thead>
@@ -2057,7 +2057,7 @@ export default function NMCFormB() {
               <span className="w-8">iv.</span>
               <span>PG students who completed their course in the last year:</span>
             </p>
-            <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-6">
+            <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-2">
               <thead>
                 <tr><th className="w-48">Name</th><th className="w-24">Joining<br/>date</th><th className="w-24">Relieving<br/>Date</th><th className="w-28">Phone no</th><th>E-mail</th><th className="w-10 no-print"></th></tr>
               </thead>
@@ -2118,7 +2118,7 @@ export default function NMCFormB() {
           <div className="a4-page portrait-page print-page">
             <PageHeader pageNum={pn(10)} />
             <div className="pl-8 pr-4 w-full -mt-2 text-[10.5pt]">
-              <table className="nmc-table tight-table text-[10pt] border-t-0 mb-4 w-full ml-8">
+              <table className="nmc-table tight-table text-[10pt] border-t-0 mb-2 w-full ml-8">
                 <tbody>
                 {academicActivities.slice(3).map((a, i) => (
                   <tr key={a.id}>
@@ -2166,7 +2166,7 @@ export default function NMCFormB() {
               <span className="w-8">a.</span>
               <span>List of External Examiners:</span>
             </p>
-            <table className="nmc-table tight-table text-[10pt] w-[90%] ml-8 mb-4">
+            <table className="nmc-table tight-table text-[10pt] w-[90%] ml-8 mb-2">
               <thead>
                 <tr><th className="w-1/3">Name</th><th className="w-1/3">Designation</th><th className="w-1/3">College/ Institute</th><th className="w-10 no-print"></th></tr>
               </thead>
@@ -2189,7 +2189,7 @@ export default function NMCFormB() {
                 ))}
               </tbody>
             </table>
-            <button className="no-print text-indigo-600 text-sm mb-4 ml-8 flex items-center -mt-2" onClick={()=>addRow(setExternalExaminers, ()=>({id:generateId(), name:'', designation:'', institute:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+            <button className="no-print text-indigo-600 text-sm mb-2 ml-8 flex items-center -mt-1" onClick={()=>addRow(setExternalExaminers, ()=>({id:generateId(), name:'', designation:'', institute:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
 
             </div>
             <PageFooter />
@@ -2204,7 +2204,7 @@ export default function NMCFormB() {
               <span className="w-8">b.</span>
               <span>List of Internal Examiners:</span>
             </p>
-            <table className="nmc-table tight-table text-[10pt] w-[90%] ml-8 mb-4">
+            <table className="nmc-table tight-table text-[10pt] w-[90%] ml-8 mb-2">
               <thead>
                 <tr><th className="w-1/2">Name</th><th className="w-1/2">Designation</th><th className="w-10 no-print"></th></tr>
               </thead>
@@ -2226,13 +2226,13 @@ export default function NMCFormB() {
                 ))}
               </tbody>
             </table>
-            <button className="no-print text-indigo-600 text-sm mb-4 ml-8 flex items-center -mt-2" onClick={()=>addRow(setInternalExaminers, ()=>({id:generateId(), name:'', designation:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+            <button className="no-print text-indigo-600 text-sm mb-2 ml-8 flex items-center -mt-1" onClick={()=>addRow(setInternalExaminers, ()=>({id:generateId(), name:'', designation:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
 
             <p className="font-bold mb-2 flex pl-16">
               <span className="w-8">c.</span>
               <span>List of Students:</span>
             </p>
-            <table className="nmc-table tight-table text-[10pt] w-[90%] ml-8 mb-4">
+            <table className="nmc-table tight-table text-[10pt] w-[90%] ml-8 mb-2">
               <thead>
                 <tr><th className="w-1/2">Name</th><th className="w-1/2">Result<br/>(Pass/ Fail)</th><th className="w-10 no-print"></th></tr>
               </thead>
@@ -2254,7 +2254,7 @@ export default function NMCFormB() {
                 ))}
               </tbody>
             </table>
-            <button className="no-print text-indigo-600 text-sm mb-4 ml-8 flex items-center -mt-2" onClick={()=>addRow(setExamStudents, ()=>({id:generateId(), name:'', result:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+            <button className="no-print text-indigo-600 text-sm mb-2 ml-8 flex items-center -mt-1" onClick={()=>addRow(setExamStudents, ()=>({id:generateId(), name:'', result:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
 
             <div className="flex mb-4 pl-16 font-bold">
               <span className="w-8">d.</span>
