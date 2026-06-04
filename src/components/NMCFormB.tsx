@@ -890,15 +890,124 @@ export default function NMCFormB() {
     </div>
   );
 
-  // ── Dynamic page overflow: faculty table ──────────────────────────────────
+  // ─── Dynamic page overflow: faculty table ──────────────────────────────────────────
   const FACULTY_FIRST = 9;   // rows on page 8 (Sr. No. 1-9), rest overflow
   const FACULTY_CONT  = 11;  // rows that fit on continuation pages
   const facultyChunks = useMemo(
     () => chunkArray(unitFaculties, FACULTY_FIRST, FACULTY_CONT),
     [unitFaculties]
   );
-  const extraFacultyPages = facultyChunks.length - 1;
-  const pn = (base: number) => base + extraFacultyPages;
+  const extraFacultyPages = Math.max(0, facultyChunks.length - 1);
+
+  // ─── Dynamic page overflow: Page 9 tables ──────────────────────────────────────────
+  const ELIGIBLE_FAC_FIRST = 2;
+  const ELIGIBLE_FAC_CONT = 12;
+  const eligibleFacChunks = useMemo(
+    () => chunkArray(eligibleFaculties, ELIGIBLE_FAC_FIRST, ELIGIBLE_FAC_CONT),
+    [eligibleFaculties]
+  );
+
+  const PG_STUDYING_FIRST = 2;
+  const PG_STUDYING_CONT = 15;
+  const pgStudyingChunks = useMemo(
+    () => chunkArray(pgStudents, PG_STUDYING_FIRST, PG_STUDYING_CONT),
+    [pgStudents]
+  );
+
+  const PAST_PG_FIRST = 2;
+  const PAST_PG_CONT = 15;
+  const pastPgChunks = useMemo(
+    () => chunkArray(pastPgStudents, PAST_PG_FIRST, PAST_PG_CONT),
+    [pastPgStudents]
+  );
+
+  const extraEligiblePages = Math.max(0, eligibleFacChunks.length - 1);
+  const extraPgStudyingPages = Math.max(0, pgStudyingChunks.length - 1);
+  const extraPastPgPages = Math.max(0, pastPgChunks.length - 1);
+
+  const extraPage9Pages = extraEligiblePages + extraPgStudyingPages + extraPastPgPages;
+
+  const EQUIP_FIRST = 15;
+  const EQUIP_CONT = 20;
+
+  const PG_INSP_FIRST = 3;
+  const PG_INSP_CONT = 12;
+  const pgInspChunks = useMemo(
+    () => chunkArray(pgInspections, PG_INSP_FIRST, PG_INSP_CONT),
+    [pgInspections]
+  );
+  const extraPgInspPages = Math.max(0, pgInspChunks.length - 1);
+  const equipChunks = useMemo(
+    () => chunkArray(equipments, EQUIP_FIRST, EQUIP_CONT),
+    [equipments]
+  );
+  const extraEquipPages = Math.max(0, equipChunks.length - 1);
+
+  const ICU_FIRST = 12;
+  const ICU_CONT = 20;
+  const icuEquipChunks = useMemo(
+    () => chunkArray(icuEquips, ICU_FIRST, ICU_CONT),
+    [icuEquips]
+  );
+  const extraIcuEquipPages = Math.max(0, icuEquipChunks.length - 1);
+
+  const OTHER_ICU_FIRST = 4;
+  const OTHER_ICU_CONT = 20;
+  const otherIcuEquipChunks = useMemo(
+    () => chunkArray(otherIcuEquips, OTHER_ICU_FIRST, OTHER_ICU_CONT),
+    [otherIcuEquips]
+  );
+  const extraOtherIcuEquipPages = Math.max(0, otherIcuEquipChunks.length - 1);
+
+  const HDU_FIRST = 12;
+  const HDU_CONT = 20;
+  const hduEquipChunks = useMemo(
+    () => chunkArray(hduEquips, HDU_FIRST, HDU_CONT),
+    [hduEquips]
+  );
+  const extraHduEquipPages = Math.max(0, hduEquipChunks.length - 1);
+
+  const OTHER_HDU_FIRST = 4;
+  const OTHER_HDU_CONT = 20;
+  const otherHduEquipChunks = useMemo(
+    () => chunkArray(otherHduEquips, OTHER_HDU_FIRST, OTHER_HDU_CONT),
+    [otherHduEquips]
+  );
+  const extraOtherHduEquipPages = Math.max(0, otherHduEquipChunks.length - 1);
+
+  const CLINICS_FIRST = 5;
+  const CLINICS_CONT = 15;
+  const clinicsChunks = useMemo(
+    () => chunkArray(clinics, CLINICS_FIRST, CLINICS_CONT),
+    [clinics]
+  );
+  const extraClinicsPages = Math.max(0, clinicsChunks.length - 1);
+
+  const EXAM_EXT_FIRST = 3;
+  const EXAM_EXT_CONT = 12;
+  const extExaminersChunks = useMemo(
+    () => chunkArray(externalExaminers, EXAM_EXT_FIRST, EXAM_EXT_CONT),
+    [externalExaminers]
+  );
+  const extraExtExaminersPages = Math.max(0, extExaminersChunks.length - 1);
+
+  const EXAM_INT_FIRST = 4;
+  const EXAM_INT_CONT = 12;
+  const intExaminersChunks = useMemo(
+    () => chunkArray(internalExaminers, EXAM_INT_FIRST, EXAM_INT_CONT),
+    [internalExaminers]
+  );
+  const extraIntExaminersPages = Math.max(0, intExaminersChunks.length - 1);
+
+  const EXAM_STUD_FIRST = 10;
+  const EXAM_STUD_CONT = 20;
+  const examStudentsChunks = useMemo(
+    () => chunkArray(examStudents, EXAM_STUD_FIRST, EXAM_STUD_CONT),
+    [examStudents]
+  );
+  const extraExamStudentsPages = Math.max(0, examStudentsChunks.length - 1);
+
+  const pn = (base: number) => base + extraFacultyPages + (base >= 2 ? extraPgInspPages : 0) + (base >= 5 ? extraEquipPages : 0) + (base >= 6 ? extraIcuEquipPages + extraOtherIcuEquipPages : 0) + (base >= 7 ? extraHduEquipPages + extraOtherHduEquipPages : 0) + (base >= 8 ? extraClinicsPages : 0) + (base >= 10 ? extraPage9Pages : 0) + (base >= 12 ? extraExtExaminersPages + extraIntExaminersPages + extraExamStudentsPages : 0);
 
   // ── Import from Doctors (Firebase) ────────────────────────────────
   const [importTarget, setImportTarget] = useState<'faculty' | 'pgStudying' | 'pgCompleted' | null>(null);
@@ -1180,7 +1289,7 @@ export default function NMCFormB() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pgInspections.map(insp => (
+                  {pgInspChunks[0]?.map(insp => (
                     <tr key={insp.id}>
                       <td><InlineTextarea value={insp.date} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'date', v)} /></td>
                       <td><InlineTextarea value={insp.purpose} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'purpose', v)} /></td>
@@ -1202,12 +1311,65 @@ export default function NMCFormB() {
                   ))}
                 </tbody>
               </table>
-              <button className="no-print text-indigo-600 text-sm mb-2 flex items-center" onClick={()=>addRow(setPgInspections, ()=>({id:generateId(), date:'', purpose:'', type:'', outcome:'', seatsInc:'', seatsDec:'', order:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+              {extraPgInspPages === 0 && (<button className="no-print text-indigo-600 text-sm mb-2 flex items-center" onClick={()=>addRow(setPgInspections, ()=>({id:generateId(), date:'', purpose:'', type:'', outcome:'', seatsInc:'', seatsDec:'', order:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>)}
             </div>
             <PageFooter />
           </div>
 
-          {/* PAGE 2 */}
+          
+            {/* CONTINUATION PAGES: PG INSPECTIONS */}
+            {pgInspChunks.slice(1).map((chunk, ci) => (
+              <div key={`pg-insp-cont-${ci}`} className="a4-page portrait-page print-page">
+                <PageHeader pageNum={1 + ci + 1} />
+                <div className="pl-4 mt-4">
+                  <div className="flex items-end mb-1">
+                    <span className="w-8">i.</span>
+                    <span className="mr-2 whitespace-nowrap font-bold">Details of PG inspections of the department in last five years: (Continued)</span>
+                  </div>
+                  <table className="nmc-table tight-table text-[8.5pt] leading-[1.2] w-full">
+                    <thead>
+                      <tr>
+                        <th className="w-[10%]">Date of<br/>Inspection</th>
+                        <th className="w-[24%]">Purpose of<br/>Inspection<br/><span className="font-normal italic">(LoP for starting a course/permission for increase of seats/ Recognition of course/ Recognition of increased seats /Renewal of Recognition/Surprise /Random Inspection/ Compliance Verification inspection/other)</span></th>
+                        <th className="w-[12%]">Type of<br/>Inspection<br/><span className="font-normal">(Physical/<br/>Virtual)</span></th>
+                        <th className="w-[24%]">Outcome<br/><span className="font-normal italic">(LoP received/denied. Permission for increase of seats received/denied. Recognition of course done/denied. Recognition of increased seats done/denied /Renewal of Recognition done/denied /other)</span></th>
+                        <th className="w-[8%]">No of seats<br/>Increased</th>
+                        <th className="w-[8%]">No of seats<br/>Decreased</th>
+                        <th className="w-[14%]">Order issued<br/>on the basis of<br/>inspection<br/><span className="font-normal italic">(Attach copy of all the order issued by NMC/MCI) as Annexure</span></th>
+                        <th className="w-10 no-print"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {chunk.map(insp => (
+                        <tr key={insp.id}>
+                          <td><InlineTextarea value={insp.date} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'date', v)} /></td>
+                          <td><InlineTextarea value={insp.purpose} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'purpose', v)} /></td>
+                          <td><InlineTextarea value={insp.type} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'type', v)} /></td>
+                          <td><InlineTextarea value={insp.outcome} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'outcome', v)} /></td>
+                          <td><InlineInput value={insp.seatsInc} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'seatsInc', v)} /></td>
+                          <td><InlineInput value={insp.seatsDec} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'seatsDec', v)} /></td>
+                          <td><InlineTextarea value={insp.order} onChange={(v:string)=>updateRow(setPgInspections, insp.id, 'order', v)} /></td>
+                          <td className="no-print text-center">
+                            <button 
+                              className="text-red-500 hover:text-red-700 p-1 flex items-center justify-center w-full h-full"
+                              onClick={() => removeRow(setPgInspections, insp.id)}
+                              title="Delete Row"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {ci === extraPgInspPages - 1 && (
+                    <button className="no-print text-indigo-600 text-sm mb-2 flex items-center" onClick={()=>addRow(setPgInspections, ()=>({id:generateId(), date:'', purpose:'', type:'', outcome:'', seatsInc:'', seatsDec:'', order:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+                  )}
+                </div>
+                <PageFooter />
+              </div>
+            ))}
+{/* PAGE 2 */}
           <div className="a4-page portrait-page print-page">
             <PageHeader pageNum={2} />
             <div className="pl-4 mt-3">
@@ -1402,7 +1564,7 @@ export default function NMCFormB() {
                   </tr>
                 </thead>
                 <tbody>
-                  {equipments.map((eq, idx) => {
+                  {(equipChunks[0] || []).map((eq, idx) => {
                     const isStandard = idx < 12;
                     return (
                       <tr key={eq.id}>
@@ -1439,7 +1601,7 @@ export default function NMCFormB() {
                   })}
                 </tbody>
               </table>
-              <button className="no-print text-indigo-600 text-sm mb-2 ml-4 flex items-center" onClick={()=>addRow(setEquipments, ()=>({id:generateId(), name:'', available:'', functional:'', specs:'', adequate:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+              {extraEquipPages === 0 && (<button className="no-print text-indigo-600 text-sm mb-2 ml-4 flex items-center" onClick={()=>addRow(setEquipments, ()=>({id:generateId(), name:'', available:'', functional:'', specs:'', adequate:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>)}
 
               <p className="font-bold mb-2 mt-4 flex"><span className="w-8">h.</span><span>Intensive care facilities under Anaesthesia department</span></p>
               <table className="nmc-table tight-table text-[9.5pt] w-[95%] ml-4 mb-4">
@@ -1473,7 +1635,61 @@ export default function NMCFormB() {
             <PageFooter />
           </div>
 
-          {/* PAGE 5 */}
+          
+          {/* CONTINUATION PAGES: EQUIPMENTS */}
+          {equipChunks.slice(1).map((chunk, ci) => (
+            <div key={`equip-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={4 + ci + 1} />
+              <div className="pl-8 mt-4 text-[10.5pt]">
+                <p className="font-bold mb-2 flex"><span className="w-8">g.</span><span>Equipment: (Continued)</span></p>
+                <table className="nmc-table tight-table text-[9.5pt] w-[95%] ml-4">
+                  <thead>
+                    <tr>
+                      <th className="w-[26%]">Equipment name</th>
+                      <th className="w-[16%]">Numbers<br/>available</th>
+                      <th className="w-[14%]">Functional<br/>status</th>
+                      <th className="w-[32%]">Important<br/>Specification in Brief</th>
+                      <th className="w-[12%]">Adequate<br/>Yes/No</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map((eq, idx) => {
+                      const isStandard = false; // Cont pages only have custom items
+                      return (
+                        <tr key={eq.id}>
+                          <td>
+                            <InlineTextarea value={eq.name} onChange={(v:string)=>updateRow(setEquipments, eq.id, 'name', v)} />
+                          </td>
+                          <td><InlineTextarea value={eq.available} onChange={(v:string)=>updateRow(setEquipments, eq.id, 'available', v)} /></td>
+                          <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setEquipments, eq.id, 'functional', v)} /></td>
+                          <td><InlineTextarea value={eq.specs} onChange={(v:string)=>updateRow(setEquipments, eq.id, 'specs', v)} /></td>
+                          <td>
+                            <div className="flex items-center gap-1">
+                              <div className="flex-1">
+                                <InlineSelect value={eq.adequate} onChange={(v:string)=>updateRow(setEquipments, eq.id, 'adequate', v)} options={["Yes", "No"]} />
+                              </div>
+                              <button 
+                                className="no-print text-red-500 hover:text-red-700 p-1 flex items-center justify-center shrink-0"
+                                onClick={() => removeRow(setEquipments, eq.id)}
+                                title="Delete Row"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {ci === extraEquipPages - 1 && (
+                  <button className="no-print text-indigo-600 text-sm mb-2 ml-4 mt-2 flex items-center" onClick={()=>addRow(setEquipments, ()=>({id:generateId(), name:'', available:'', functional:'', specs:'', adequate:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+                )}
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+{/* PAGE 5 */}
           <div className="a4-page portrait-page print-page">
             <PageHeader pageNum={5} />
             <div className="pl-12 w-full text-[10.5pt] mt-3">
@@ -1481,7 +1697,7 @@ export default function NMCFormB() {
               <table className="nmc-table tight-table text-[9.5pt] w-full mb-4">
                 <thead><tr><th className="w-[45%]">Item</th><th className="w-16">Number</th><th className="w-20">Available/Not<br/>Available</th><th className="w-20">Functional<br/>Status</th><th>Remarks</th></tr></thead>
                 <tbody>
-                  {icuEquips.map((eq, idx) => {
+                  {(icuEquipChunks[0] || []).map((eq, idx) => {
                     const isStandard = idx < 6;
                     return (
                       <tr key={eq.id}>
@@ -1529,7 +1745,7 @@ export default function NMCFormB() {
               <table className="nmc-table tight-table text-[9.5pt] w-full mb-4">
                 <thead><tr><th className="w-[45%]">Item</th><th className="w-16">Number</th><th className="w-20">Available/Not<br/>Available</th><th className="w-20">Functional<br/>Status</th><th>Remarks</th></tr></thead>
                 <tbody>
-                  {otherIcuEquips.map((eq, idx) => {
+                  {(otherIcuEquipChunks[0] || []).map((eq, idx) => {
                     const isStandard = idx < 9;
                     return (
                       <tr key={eq.id}>
@@ -1601,7 +1817,94 @@ export default function NMCFormB() {
             <PageFooter />
           </div>
 
-          {/* PAGE 6 */}
+          
+          {/* CONTINUATION PAGES: ICU EQUIPS */}
+          {icuEquipChunks.slice(1).map((chunk, ci) => (
+            <div key={`icu-equip-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={5 + extraEquipPages + ci + 1} />
+              <div className="pl-12 w-full text-[10.5pt] mt-4">
+                <p className="font-bold mb-2 flex"><span className="w-8">i.</span><span>Equipment in ICU (Continued)</span></p>
+                <table className="nmc-table tight-table text-[9pt] w-[95%] mb-4">
+                  <thead>
+                    <tr>
+                      <th className="w-[35%]">Name of the item</th>
+                      <th className="w-[12%]">Required</th>
+                      <th className="w-[12%]">Available</th>
+                      <th className="w-[12%]">Functional</th>
+                      <th className="w-[29%]">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map((eq, idx) => (
+                        <tr key={eq.id}>
+                          <td><InlineTextarea value={eq.item} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'item', v)} /></td>
+                          <td><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'num', v)} /></td>
+                          <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                          <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'functional', v)} /></td>
+                          <td><InlineTextarea value={eq.remarks} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'remarks', v)} /></td>
+                        </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+
+          {/* CONTINUATION PAGES: OTHER ICU EQUIPS */}
+          {otherIcuEquipChunks.slice(1).map((chunk, ci) => (
+            <div key={`other-icu-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={5 + extraEquipPages + extraIcuEquipPages + ci + 1} />
+              <div className="pl-12 w-full text-[10.5pt] mt-4">
+                <p className="font-bold mb-2 flex"><span>Other equipments for ICU: (Continued)</span></p>
+                <table className="nmc-table tight-table text-[9pt] w-[95%] mb-2">
+                  <thead>
+                    <tr>
+                      <th className="w-[35%]">Name of the item</th>
+                      <th className="w-[12%]">Required</th>
+                      <th className="w-[12%]">Available</th>
+                      <th className="w-[12%]">Functional</th>
+                      <th className="w-[29%]">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map((eq, idx) => (
+                        <tr key={eq.id}>
+                          <td><InlineTextarea value={eq.item} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'item', v)} /></td>
+                          <td><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'num', v)} /></td>
+                          <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                          <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'functional', v)} /></td>
+                          <td>
+                            <div className="flex items-start gap-1">
+                              <div className="flex-1">
+                                <InlineTextarea value={eq.remarks} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'remarks', v)} />
+                              </div>
+                              <button 
+                                className="no-print text-red-500 hover:text-red-700 p-1 flex items-center justify-center shrink-0"
+                                onClick={() => removeRow(setOtherIcuEquips, eq.id)}
+                                title="Delete Row"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {ci === extraOtherIcuEquipPages - 1 && (
+                  <button 
+                    className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
+                    onClick={() => addRow(setOtherIcuEquips, () => ({ id: generateId(), item: '', num: '', available: '', functional: '', remarks: '' }))}
+                  >
+                    <Plus className="w-4 h-4 mr-1"/> Add Record
+                  </button>
+                )}
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+{/* PAGE 6 */}
           <div className="a4-page portrait-page print-page">
             <PageHeader pageNum={6} />
             <div className="pl-12 pr-4 w-full text-[10.5pt] mt-2 space-y-4">
@@ -1613,7 +1916,7 @@ export default function NMCFormB() {
                     <tr><th className="w-[40%]">Item</th><th className="w-16">Number per<br/><span className="line-through">ICU bed</span><br/>Number</th><th className="w-24">Available/Not<br/>Available</th><th className="w-20">Functional<br/>Status</th><th>Remarks</th></tr>
                   </thead>
                   <tbody>
-                    {hduEquips.map((eq, idx) => {
+                    {(hduEquipChunks[0] || []).map((eq, idx) => {
                       const isStandard = idx < 5;
                       return (
                         <tr key={eq.id}>
@@ -1707,7 +2010,94 @@ export default function NMCFormB() {
             <PageFooter />
           </div>
 
-          {/* PAGE 7 */}
+          
+          {/* CONTINUATION PAGES: HDU EQUIPS */}
+          {hduEquipChunks.slice(1).map((chunk, ci) => (
+            <div key={`hdu-equip-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={6 + extraEquipPages + extraIcuEquipPages + extraOtherIcuEquipPages + ci + 1} />
+              <div className="pl-12 pr-4 w-full text-[10.5pt] mt-4 space-y-4">
+                <p className="font-bold mb-2 flex"><span className="w-8">ii.</span><span>Equipment in HDU (Continued)</span></p>
+                <table className="nmc-table tight-table text-[9pt] w-[95%] mb-4">
+                  <thead>
+                    <tr>
+                      <th className="w-[35%]">Name of the item</th>
+                      <th className="w-[12%]">Required</th>
+                      <th className="w-[12%]">Available</th>
+                      <th className="w-[12%]">Functional</th>
+                      <th className="w-[29%]">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map((eq, idx) => (
+                        <tr key={eq.id}>
+                          <td><InlineTextarea value={eq.item} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'item', v)} /></td>
+                          <td><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'num', v)} /></td>
+                          <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                          <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'functional', v)} /></td>
+                          <td><InlineTextarea value={eq.remarks} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'remarks', v)} /></td>
+                        </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+
+          {/* CONTINUATION PAGES: OTHER HDU EQUIPS */}
+          {otherHduEquipChunks.slice(1).map((chunk, ci) => (
+            <div key={`other-hdu-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={6 + extraEquipPages + extraIcuEquipPages + extraOtherIcuEquipPages + extraHduEquipPages + ci + 1} />
+              <div className="pl-12 pr-4 w-full text-[10.5pt] mt-4 space-y-4">
+                <p className="font-bold mb-2 flex"><span>Other equipments for HDU: (Continued)</span></p>
+                <table className="nmc-table tight-table text-[9pt] w-[95%] mb-2">
+                  <thead>
+                    <tr>
+                      <th className="w-[35%]">Name of the item</th>
+                      <th className="w-[12%]">Required</th>
+                      <th className="w-[12%]">Available</th>
+                      <th className="w-[12%]">Functional</th>
+                      <th className="w-[29%]">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map((eq, idx) => (
+                        <tr key={eq.id}>
+                          <td><InlineTextarea value={eq.item} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'item', v)} /></td>
+                          <td><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'num', v)} /></td>
+                          <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                          <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'functional', v)} /></td>
+                          <td>
+                            <div className="flex items-start gap-1">
+                              <div className="flex-1">
+                                <InlineTextarea value={eq.remarks} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'remarks', v)} />
+                              </div>
+                              <button 
+                                className="no-print text-red-500 hover:text-red-700 p-1 flex items-center justify-center shrink-0"
+                                onClick={() => removeRow(setOtherHduEquips, eq.id)}
+                                title="Delete Row"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {ci === extraOtherHduEquipPages - 1 && (
+                  <button 
+                    className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
+                    onClick={() => addRow(setOtherHduEquips, () => ({ id: generateId(), item: '', num: '', available: '', functional: '', remarks: '' }))}
+                  >
+                    <Plus className="w-4 h-4 mr-1"/> Add Record
+                  </button>
+                )}
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+{/* PAGE 7 */}
           <div className="a4-page portrait-page print-page">
             <PageHeader pageNum={7} />
             <div className="pl-12 pr-4 w-full -mt-2 text-[10.5pt]">
@@ -1770,12 +2160,12 @@ export default function NMCFormB() {
                   })}
                 </tbody>
               </table>
-              <button 
+              {extraClinicsPages === 0 && (<button 
                 className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
                 onClick={() => addRow(setClinics, () => ({ id: generateId(), name: '', days: '', timings: '', cases: '', incharge: '' }))}
               >
                 <Plus className="w-4 h-4 mr-1"/> Add Record
-              </button>
+              </button>)}
 
               <h4 className="font-bold text-[12pt] mb-3 flex mt-4">
                 <span className="w-8">D.</span>
@@ -1840,7 +2230,51 @@ export default function NMCFormB() {
             <PageFooter />
           </div>
 
-          {/* PAGE 8+ (Landscape) — auto-paginating unit faculty table */}
+          
+          {/* CONTINUATION PAGES: CLINICS */}
+          {clinicsChunks.slice(1).map((chunk, ci) => (
+            <div key={`clinics-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={7 + extraEquipPages + extraIcuEquipPages + extraOtherIcuEquipPages + extraHduEquipPages + extraOtherHduEquipPages + ci + 1} />
+              <div className="pl-12 pr-4 w-full text-[10.5pt] mt-4">
+                <p className="font-bold mb-2 flex"><span>Clinics: (Continued)</span></p>
+                <table className="nmc-table tight-table text-[9pt] w-full mb-2">
+                  <thead>
+                    <tr><th className="w-40">Name of the Clinic</th><th className="w-24">Days</th><th className="w-24">Timings</th><th className="w-24">Average No. of<br/>cases per day</th><th>Name of Clinic In-charge</th><th className="w-10 no-print"></th></tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map(c => (
+                      <tr key={c.id}>
+                        <td><InlineInput value={c.name} onChange={(v:string)=>updateRow(setClinics, c.id, 'name', v)} /></td>
+                        <td><InlineInput value={c.days} onChange={(v:string)=>updateRow(setClinics, c.id, 'days', v)} /></td>
+                        <td><InlineInput value={c.timings} onChange={(v:string)=>updateRow(setClinics, c.id, 'timings', v)} /></td>
+                        <td><InlineInput value={c.cases} onChange={(v:string)=>updateRow(setClinics, c.id, 'cases', v)} /></td>
+                        <td><InlineInput value={c.incharge} onChange={(v:string)=>updateRow(setClinics, c.id, 'incharge', v)} /></td>
+                        <td className="no-print text-center">
+                          <button 
+                            className="text-red-500 hover:text-red-700 p-1 flex items-center justify-center w-full h-full"
+                            onClick={() => removeRow(setClinics, c.id)}
+                            title="Delete Row"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {ci === extraClinicsPages - 1 && (
+                  <button 
+                    className="no-print text-indigo-600 text-sm mb-4 flex items-center" 
+                    onClick={() => addRow(setClinics, () => ({ id: generateId(), name: '', days: '', timings: '', cases: '', incharge: '' }))}
+                  >
+                    <Plus className="w-4 h-4 mr-1"/> Add Record
+                  </button>
+                )}
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+{/* PAGE 8+ (Landscape) — auto-paginating unit faculty table */}
           {facultyChunks.map((chunk, ci) => (
             <div key={`faculty-page-${ci}`} className="a4-page landscape-page print-page relative">
               <PageHeader pageNum={8 + ci} />
@@ -1971,7 +2405,7 @@ export default function NMCFormB() {
                 </tr>
               </thead>
               <tbody>
-                {eligibleFaculties.map((f, i) => (
+                {(eligibleFacChunks[0] || []).map((f, i) => (
                   <tr key={f.id} className="align-top">
                     <td><InlineTextarea rows={1} value={f.designation} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'designation', v)} /></td>
                     <td><InlineTextarea rows={1} value={f.num} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'num', v)} /></td>
@@ -1990,8 +2424,8 @@ export default function NMCFormB() {
                     </td>
                     {i === 0 && (
                       <>
-                        <td rowSpan={Math.max(1, eligibleFaculties.length)}><InlineTextarea className="h-full" value={f.seats} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'seats', v)} /></td>
-                        <td rowSpan={Math.max(1, eligibleFaculties.length)}><InlineTextarea className="h-full" value={f.adequate} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'adequate', v)} /></td>
+                        <td rowSpan={Math.max(1, (eligibleFacChunks[0] || []).length)}><InlineTextarea className="h-full" value={f.seats} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'seats', v)} /></td>
+                        <td rowSpan={Math.max(1, (eligibleFacChunks[0] || []).length)}><InlineTextarea className="h-full" value={f.adequate} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'adequate', v)} /></td>
                       </>
                     )}
                     <td className="no-print text-center">
@@ -2008,14 +2442,16 @@ export default function NMCFormB() {
               </tbody>
             </table>
             
-            <div className="no-print flex gap-3 mt-2 ml-8 mb-8 items-center">
-              <button
-                className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
-                onClick={() => setEligibleFaculties(prev => [...prev, { id: generateId(), designation: '', num: '', name: '', seats: '', adequate: '' }])}
-              >
-                <Plus className="w-4 h-4 mr-1"/> Add Record
-              </button>
-            </div>
+            {extraEligiblePages === 0 && (
+              <div className="no-print flex gap-3 mt-2 ml-8 mb-8 items-center">
+                <button
+                  className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
+                  onClick={() => setEligibleFaculties(prev => [...prev, { id: generateId(), designation: '', num: '', name: '', seats: '', adequate: '' }])}
+                >
+                  <Plus className="w-4 h-4 mr-1"/> Add Record
+                </button>
+              </div>
+            )}
 
             <p className="font-bold mb-2 flex pl-8">
               <span className="w-8">iii.</span>
@@ -2026,7 +2462,7 @@ export default function NMCFormB() {
                 <tr><th className="w-48">Name</th><th className="w-32">Joining date</th><th className="w-32">Phone No</th><th>E-mail</th><th className="w-10 no-print"></th></tr>
               </thead>
               <tbody>
-                {pgStudents.map(s => (
+                {(pgStudyingChunks[0] || []).map(s => (
                   <tr key={s.id}>
                     <td><InlineInput value={s.name} onChange={(v:string)=>updateRow(setPgStudents, s.id, 'name', v)} /></td>
                     <td><InlineInput value={s.joiningDate} onChange={(v:string)=>updateRow(setPgStudents, s.id, 'joiningDate', v)} /></td>
@@ -2045,14 +2481,16 @@ export default function NMCFormB() {
                 ))}
               </tbody>
             </table>
-            <div className="flex items-center gap-4 mb-6 ml-8 mt-2">
-              <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', phone:'', email:''}))}>
-                <Plus className="w-4 h-4 mr-1"/> Add Record
-              </button>
-              <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgStudying'); }}>
-                <Users className="w-4 h-4 mr-1"/> Import from Doctors
-              </button>
-            </div>
+            {extraPgStudyingPages === 0 && (
+              <div className="flex items-center gap-4 mb-6 ml-8 mt-2">
+                <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', phone:'', email:''}))}>
+                  <Plus className="w-4 h-4 mr-1"/> Add Record
+                </button>
+                <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgStudying'); }}>
+                  <Users className="w-4 h-4 mr-1"/> Import from Doctors
+                </button>
+              </div>
+            )}
 
             <p className="font-bold mb-2 flex pl-8">
               <span className="w-8">iv.</span>
@@ -2063,7 +2501,7 @@ export default function NMCFormB() {
                 <tr><th className="w-48">Name</th><th className="w-24">Joining<br/>date</th><th className="w-24">Relieving<br/>Date</th><th className="w-28">Phone no</th><th>E-mail</th><th className="w-10 no-print"></th></tr>
               </thead>
               <tbody>
-                {pastPgStudents.map(s => (
+                {(pastPgChunks[0] || []).map(s => (
                   <tr key={s.id}>
                     <td><InlineInput value={s.name} onChange={(v:string)=>updateRow(setPastPgStudents, s.id, 'name', v)} /></td>
                     <td><InlineInput value={s.joiningDate} onChange={(v:string)=>updateRow(setPastPgStudents, s.id, 'joiningDate', v)} /></td>
@@ -2083,14 +2521,16 @@ export default function NMCFormB() {
                 ))}
               </tbody>
             </table>
-            <div className="flex items-center gap-4 mb-8 ml-8 mt-2">
-              <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPastPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', relievingDate:'', phone:'', email:''}))}>
-                <Plus className="w-4 h-4 mr-1"/> Add Record
-              </button>
-              <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgCompleted'); }}>
-                <Users className="w-4 h-4 mr-1"/> Import from Doctors
-              </button>
-            </div>
+            {extraPastPgPages === 0 && (
+              <div className="flex items-center gap-4 mb-8 ml-8 mt-2">
+                <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPastPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', relievingDate:'', phone:'', email:''}))}>
+                  <Plus className="w-4 h-4 mr-1"/> Add Record
+                </button>
+                <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgCompleted'); }}>
+                  <Users className="w-4 h-4 mr-1"/> Import from Doctors
+                </button>
+              </div>
+            )}
 
             <h4 className="font-bold text-[12pt] mb-4 flex pl-8">
               <span className="w-8">F.</span>
@@ -2115,7 +2555,162 @@ export default function NMCFormB() {
             <PageFooter />
           </div>
 
-          {/* PAGE 11 */}
+          
+          {/* CONTINUATION PAGES: ELIGIBLE FACULTIES */}
+          {eligibleFacChunks.slice(1).map((chunk, ci) => (
+            <div key={`ef-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={pn(9) + ci + 1} />
+              <p className="font-bold mb-4 flex pl-8 pr-4 mt-4">
+                <span className="w-8">ii.</span>
+                <span className="text-justify">Total eligible faculties and Senior Residents... (Continued)</span>
+              </p>
+              <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-8">
+                <thead>
+                  <tr>
+                    <th className="w-32 text-left pl-2">Designation</th>
+                    <th className="w-20 text-left pl-2">Number</th>
+                    <th className="w-48 text-left pl-2">Name</th>
+                    <th className="w-10 no-print"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {chunk.map((f, i) => (
+                    <tr key={f.id} className="align-top">
+                      <td><InlineTextarea rows={1} value={f.designation} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'designation', v)} /></td>
+                      <td><InlineTextarea rows={1} value={f.num} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'num', v)} /></td>
+                      <td className="relative group">
+                        <InlineTextarea rows={1} value={f.name} onChange={(v:string)=>updateRow(setEligibleFaculties, f.id, 'name', v)} />
+                        <button 
+                          className="no-print absolute top-1 right-1 p-1 bg-white border border-slate-200 rounded text-slate-400 hover:text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                          onClick={() => {
+                            setRowSelectedDoctorIds(new Set());
+                            setRowDoctorModalId(f.id);
+                          }}
+                          title="Select Doctors from Faculty Table"
+                        >
+                          <ListPlus className="w-4 h-4" />
+                        </button>
+                      </td>
+                      <td className="no-print text-center">
+                        <button
+                          className="text-red-500 hover:text-red-700 p-1 flex items-center justify-center w-full h-full"
+                          onClick={() => removeRow(setEligibleFaculties, f.id)}
+                          title="Delete Row"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {ci === extraEligiblePages - 1 && (
+                <div className="no-print flex gap-3 mt-2 ml-8 mb-8 items-center">
+                  <button
+                    className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
+                    onClick={() => setEligibleFaculties(prev => [...prev, { id: generateId(), designation: '', num: '', name: '', seats: '', adequate: '' }])}
+                  >
+                    <Plus className="w-4 h-4 mr-1"/> Add Record
+                  </button>
+                </div>
+              )}
+              <PageFooter />
+            </div>
+          ))}
+
+          {/* CONTINUATION PAGES: PG STUDYING */}
+          {pgStudyingChunks.slice(1).map((chunk, ci) => (
+            <div key={`pg-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={pn(9) + extraEligiblePages + ci + 1} />
+              <p className="font-bold mb-2 flex pl-8 mt-4">
+                <span className="w-8">iii.</span>
+                <span>P.G students presently studying in the Department: (Continued)</span>
+              </p>
+              <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-6">
+                <thead>
+                  <tr><th className="w-48">Name</th><th className="w-32">Joining date</th><th className="w-32">Phone No</th><th>E-mail</th><th className="w-10 no-print"></th></tr>
+                </thead>
+                <tbody>
+                  {chunk.map(s => (
+                    <tr key={s.id}>
+                      <td><InlineInput value={s.name} onChange={(v:string)=>updateRow(setPgStudents, s.id, 'name', v)} /></td>
+                      <td><InlineInput value={s.joiningDate} onChange={(v:string)=>updateRow(setPgStudents, s.id, 'joiningDate', v)} /></td>
+                      <td><InlineInput value={s.phone} onChange={(v:string)=>updateRow(setPgStudents, s.id, 'phone', v)} /></td>
+                      <td><InlineInput value={s.email} onChange={(v:string)=>updateRow(setPgStudents, s.id, 'email', v)} /></td>
+                      <td className="no-print text-center">
+                        <button 
+                          className="text-red-500 hover:text-red-700 p-1 flex items-center justify-center w-full h-full"
+                          onClick={() => removeRow(setPgStudents, s.id)}
+                          title="Delete Row"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {ci === extraPgStudyingPages - 1 && (
+                <div className="flex items-center gap-4 mb-6 ml-8 mt-2">
+                  <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', phone:'', email:''}))}>
+                    <Plus className="w-4 h-4 mr-1"/> Add Record
+                  </button>
+                  <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgStudying'); }}>
+                    <Users className="w-4 h-4 mr-1"/> Import from Doctors
+                  </button>
+                </div>
+              )}
+              <PageFooter />
+            </div>
+          ))}
+
+          {/* CONTINUATION PAGES: PAST PG */}
+          {pastPgChunks.slice(1).map((chunk, ci) => (
+            <div key={`past-pg-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={pn(9) + extraEligiblePages + extraPgStudyingPages + ci + 1} />
+              <p className="font-bold mb-2 flex pl-8 mt-4">
+                <span className="w-8">iv.</span>
+                <span>PG students who completed their course in the last year: (Continued)</span>
+              </p>
+              <table className="nmc-table tight-table text-[10pt] ml-8 w-[92%] mb-6">
+                <thead>
+                  <tr><th className="w-48">Name</th><th className="w-24">Joining<br/>date</th><th className="w-24">Relieving<br/>Date</th><th className="w-28">Phone no</th><th>E-mail</th><th className="w-10 no-print"></th></tr>
+                </thead>
+                <tbody>
+                  {chunk.map(s => (
+                    <tr key={s.id}>
+                      <td><InlineInput value={s.name} onChange={(v:string)=>updateRow(setPastPgStudents, s.id, 'name', v)} /></td>
+                      <td><InlineInput value={s.joiningDate} onChange={(v:string)=>updateRow(setPastPgStudents, s.id, 'joiningDate', v)} /></td>
+                      <td><InlineInput value={s.relievingDate} onChange={(v:string)=>updateRow(setPastPgStudents, s.id, 'relievingDate', v)} /></td>
+                      <td><InlineInput value={s.phone} onChange={(v:string)=>updateRow(setPastPgStudents, s.id, 'phone', v)} /></td>
+                      <td><InlineInput value={s.email} onChange={(v:string)=>updateRow(setPastPgStudents, s.id, 'email', v)} /></td>
+                      <td className="no-print text-center">
+                        <button 
+                          className="text-red-500 hover:text-red-700 p-1 flex items-center justify-center w-full h-full"
+                          onClick={() => removeRow(setPastPgStudents, s.id)}
+                          title="Delete Row"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {ci === extraPastPgPages - 1 && (
+                <div className="flex items-center gap-4 mb-8 ml-8 mt-2">
+                  <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPastPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', relievingDate:'', phone:'', email:''}))}>
+                    <Plus className="w-4 h-4 mr-1"/> Add Record
+                  </button>
+                  <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgCompleted'); }}>
+                    <Users className="w-4 h-4 mr-1"/> Import from Doctors
+                  </button>
+                </div>
+              )}
+              <PageFooter />
+            </div>
+          ))}
+{/* PAGE 11 */}
           <div className="a4-page portrait-page print-page">
             <PageHeader pageNum={pn(10)} />
             <div className="pl-8 pr-4 w-full -mt-2 text-[10.5pt]">
@@ -2196,7 +2791,95 @@ export default function NMCFormB() {
             <PageFooter />
           </div>
 
-          {/* PAGE 12 */}
+          
+          {/* CONTINUATION PAGES: EXAM */}
+          {extExaminersChunks.slice(1).map((chunk, ci) => (
+            <div key={`ext-exam-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={pn(11) + ci + 1} />
+              <div className="pl-8 pr-4 w-full mt-4 text-[10.5pt]">
+                <p className="font-bold mb-2 flex"><span>External Examiners: (Continued)</span></p>
+                <table className="nmc-table tight-table text-[10pt] border-t-0 mb-4 w-full">
+                  <thead>
+                    <tr><th className="w-48">Name</th><th className="w-32">Designation</th><th className="w-48">Institution</th><th>E-mail</th><th className="w-24">Mobile no</th><th className="w-10 no-print"></th></tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map(ex => (
+                      <tr key={ex.id}>
+                        <td><InlineInput value={ex.name} onChange={(v:string)=>updateRow(setExternalExaminers, ex.id, 'name', v)} /></td>
+                        <td><InlineInput value={ex.designation} onChange={(v:string)=>updateRow(setExternalExaminers, ex.id, 'designation', v)} /></td>
+                        <td><InlineInput value={ex.institution} onChange={(v:string)=>updateRow(setExternalExaminers, ex.id, 'institution', v)} /></td>
+                        <td><InlineInput value={ex.email} onChange={(v:string)=>updateRow(setExternalExaminers, ex.id, 'email', v)} /></td>
+                        <td><InlineInput value={ex.mobile} onChange={(v:string)=>updateRow(setExternalExaminers, ex.id, 'mobile', v)} /></td>
+                        <td className="no-print text-center"><button className="text-red-500 hover:text-red-700 p-1" onClick={() => removeRow(setExternalExaminers, ex.id)}><Trash2 className="w-4 h-4" /></button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {ci === extraExtExaminersPages - 1 && (
+                  <button className="no-print text-indigo-600 text-sm mb-4 flex items-center" onClick={() => addRow(setExternalExaminers, () => ({ id: generateId(), name: '', designation: '', institution: '', email: '', mobile: '' }))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+                )}
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+
+          {intExaminersChunks.slice(1).map((chunk, ci) => (
+            <div key={`int-exam-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={pn(11) + extraExtExaminersPages + ci + 1} />
+              <div className="pl-8 pr-4 w-full mt-4 text-[10.5pt]">
+                <p className="font-bold mb-2 flex"><span>Internal Examiners: (Continued)</span></p>
+                <table className="nmc-table tight-table text-[10pt] mb-4 w-[85%]">
+                  <thead>
+                    <tr><th className="w-48">Name</th><th className="w-32">Designation</th><th>E-mail</th><th className="w-24">Mobile no</th><th className="w-10 no-print"></th></tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map(ex => (
+                      <tr key={ex.id}>
+                        <td><InlineInput value={ex.name} onChange={(v:string)=>updateRow(setInternalExaminers, ex.id, 'name', v)} /></td>
+                        <td><InlineInput value={ex.designation} onChange={(v:string)=>updateRow(setInternalExaminers, ex.id, 'designation', v)} /></td>
+                        <td><InlineInput value={ex.email} onChange={(v:string)=>updateRow(setInternalExaminers, ex.id, 'email', v)} /></td>
+                        <td><InlineInput value={ex.mobile} onChange={(v:string)=>updateRow(setInternalExaminers, ex.id, 'mobile', v)} /></td>
+                        <td className="no-print text-center"><button className="text-red-500 hover:text-red-700 p-1" onClick={() => removeRow(setInternalExaminers, ex.id)}><Trash2 className="w-4 h-4" /></button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {ci === extraIntExaminersPages - 1 && (
+                  <button className="no-print text-indigo-600 text-sm mb-4 flex items-center" onClick={() => addRow(setInternalExaminers, () => ({ id: generateId(), name: '', designation: '', email: '', mobile: '' }))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+                )}
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+
+          {examStudentsChunks.slice(1).map((chunk, ci) => (
+            <div key={`exam-stud-cont-${ci}`} className="a4-page portrait-page print-page">
+              <PageHeader pageNum={pn(11) + extraExtExaminersPages + extraIntExaminersPages + ci + 1} />
+              <div className="pl-8 pr-4 w-full mt-4 text-[10.5pt]">
+                <p className="font-bold mb-2 flex"><span>Details of Examinees: (Continued)</span></p>
+                <table className="nmc-table tight-table text-[10pt] mb-4 w-[60%]">
+                  <thead>
+                    <tr><th className="w-16">Sr No</th><th>Name of student</th><th className="w-32">Pass / Fail</th><th className="w-10 no-print"></th></tr>
+                  </thead>
+                  <tbody>
+                    {chunk.map((s, idx) => (
+                      <tr key={s.id}>
+                        <td className="text-center">{EXAM_STUD_FIRST + ci * EXAM_STUD_CONT + idx + 1}</td>
+                        <td><InlineInput value={s.name} onChange={(v:string)=>updateRow(setExamStudents, s.id, 'name', v)} /></td>
+                        <td><InlineSelect value={s.passFail} onChange={(v:string)=>updateRow(setExamStudents, s.id, 'passFail', v)} options={["Pass", "Fail"]} /></td>
+                        <td className="no-print text-center"><button className="text-red-500 hover:text-red-700 p-1" onClick={() => removeRow(setExamStudents, s.id)}><Trash2 className="w-4 h-4" /></button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {ci === extraExamStudentsPages - 1 && (
+                  <button className="no-print text-indigo-600 text-sm mb-4 flex items-center" onClick={() => addRow(setExamStudents, () => ({ id: generateId(), name: '', passFail: '' }))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+                )}
+              </div>
+              <PageFooter />
+            </div>
+          ))}
+{/* PAGE 12 */}
           <div className="a4-page portrait-page print-page relative">
             <PageHeader pageNum={pn(11)} />
             <div className="pl-8 pr-4 w-full -mt-2 text-[10.5pt]">
