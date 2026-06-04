@@ -1515,11 +1515,11 @@ export default function NMCFormB() {
                   {icus.map(icu => (
                     <tr key={icu.id}>
                       <td><InlineInput value={icu.name} onChange={(v:string)=>updateRow(setIcus, icu.id, 'name', v)} /></td>
-                      <td><InlineInput value={icu.beds} onChange={(v:string)=>updateRow(setIcus, icu.id, 'beds', v)} /></td>
-                      <td><InlineInput value={icu.occDay} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occDay', v)} /></td>
-                      <td><InlineInput value={icu.occYr1} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr1', v)} /></td>
-                      <td><InlineInput value={icu.occYr2} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr2', v)} /></td>
-                      <td><InlineInput value={icu.occYr3} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr3', v)} /></td>
+                      <td className="text-center"><InlineTextarea value={icu.beds} onChange={(v:string)=>updateRow(setIcus, icu.id, 'beds', v)} className="text-center" /></td>
+                      <td className="text-center"><InlineTextarea value={icu.occDay} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occDay', v)} className="text-center" /></td>
+                      <td className="text-center"><InlineTextarea value={icu.occYr1} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr1', v)} className="text-center" /></td>
+                      <td className="text-center"><InlineTextarea value={icu.occYr2} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr2', v)} className="text-center" /></td>
+                      <td className="text-center"><InlineTextarea value={icu.occYr3} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr3', v)} className="text-center" /></td>
                     </tr>
                   ))}
                 </tbody>
