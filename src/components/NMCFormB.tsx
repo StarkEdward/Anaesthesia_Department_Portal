@@ -989,13 +989,12 @@ export default function NMCFormB() {
   const [selectedDoctorIds, setSelectedDoctorIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!importTarget) return;
     const q = query(collection(db, 'doctors'), orderBy('first_name'));
     const unsub = onSnapshot(q, snap => {
       setFirestoreDoctors(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
     return () => unsub();
-  }, [importTarget]);
+  }, []);
 
   const filteredFirestoreDoctors = firestoreDoctors
     .filter(d => {
@@ -1803,6 +1802,13 @@ export default function NMCFormB() {
             <div className="pl-12 pr-4 w-full -mt-2 text-[10.5pt]">
               <h4 className="font-bold text-[12pt] mb-1.5 mt-4 flex"><span className="w-8">C.</span><span>SERVICES:</span></h4>
               <p className="font-bold mb-1 flex"><span className="w-6">i.</span><span>Specialty clinics run by the department of Anaesthesia with number of patients in each:</span></p>
+              
+              <datalist id="doctor-names">
+                {firestoreDoctors.map(d => (
+                  <option key={d.id} value={`${d.title || 'Dr.'} ${d.first_name} ${d.middle_name ? d.middle_name + ' ' : ''}${d.last_name}`} />
+                ))}
+              </datalist>
+
               <table className="nmc-table tight-table text-[9.5pt] w-full mb-2">
                 <thead>
                   <tr><th className="w-48 text-left pl-2">Name of the Clinic</th><th className="w-24">Weekday/s</th><th className="w-24">Timings</th><th className="w-32">Average<br/>number of<br/>cases/days</th><th className="text-left pl-2">Name of Clinic In-charge</th></tr>
@@ -1830,12 +1836,13 @@ export default function NMCFormB() {
                         {isStandard ? (
                           i === 0 ? (
                             <td rowSpan={2} className="align-middle">
-                              <InlineTextarea
+                              <InlineInput
                                 value={clinics[0].incharge}
                                 onChange={(v: string) => {
                                   updateRow(setClinics, clinics[0].id, 'incharge', v);
                                   if (clinics[1]) updateRow(setClinics, clinics[1].id, 'incharge', v);
                                 }}
+                                list="doctor-names"
                               />
                             </td>
                           ) : null
@@ -1843,7 +1850,7 @@ export default function NMCFormB() {
                           <td>
                             <div className="flex items-start gap-1">
                               <div className="flex-1">
-                                <InlineTextarea value={c.incharge} onChange={(v:string)=>updateRow(setClinics, c.id, 'incharge', v)} />
+                                <InlineInput value={c.incharge} onChange={(v:string)=>updateRow(setClinics, c.id, 'incharge', v)} list="doctor-names" />
                               </div>
                               <button 
                                 className="no-print text-red-500 hover:text-red-700 p-1 flex items-center justify-center shrink-0"
