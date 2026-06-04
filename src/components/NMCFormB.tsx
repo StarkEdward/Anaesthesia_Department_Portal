@@ -2106,7 +2106,7 @@ export default function NMCFormB() {
                   <th className="w-16 text-left pl-2">Number</th>
                   <th className="w-64 text-left pl-2">Name</th>
                   <th className="w-28 text-left pl-2">Total<br/>number of<br/>Admission<br/>(Seats)</th>
-                  <th className="text-left pl-2">Adequate / Not<br/>Adequate for<br/>number of<br/>Admission</th>
+                  <th className="w-40 text-left pl-2">Adequate / Not<br/>Adequate for<br/>number of<br/>Admission</th>
                   <th className="w-10 no-print"></th>
                 </tr>
               </thead>
