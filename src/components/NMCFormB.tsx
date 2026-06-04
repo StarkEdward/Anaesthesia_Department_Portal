@@ -1225,12 +1225,26 @@ export default function NMCFormB() {
                   {otherCourses.map(c => (
                     <tr key={c.id}>
                       <td><InlineInput value={c.name} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'name', v)} /></td>
-                      <td className="text-center">
-                        <InlineInput value={c.permitted} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'permitted', v)} className="text-center" list="yes-no-options" />
-                        <datalist id="yes-no-options">
-                          <option value="Yes" />
-                          <option value="No" />
-                        </datalist>
+                      <td className="text-center align-top pt-1">
+                        <div className="flex flex-col items-center gap-1">
+                          <InlineSelect 
+                            value={(c.permitted === 'Yes' || c.permitted === 'No' || c.permitted === '') ? c.permitted : 'Other'} 
+                            onChange={(v:string) => {
+                              if (v === 'Other') updateRow(setOtherCourses, c.id, 'permitted', ' ');
+                              else updateRow(setOtherCourses, c.id, 'permitted', v);
+                            }} 
+                            options={["Yes", "No", "Other"]} 
+                            className="text-center" 
+                          />
+                          {c.permitted !== 'Yes' && c.permitted !== 'No' && c.permitted !== '' && (
+                            <InlineInput 
+                              value={c.permitted.trim() === '' ? '' : c.permitted} 
+                              onChange={(v:string) => updateRow(setOtherCourses, c.id, 'permitted', v || ' ')} 
+                              placeholder="Please specify" 
+                              className="text-center text-sm !border-b !border-slate-300 w-full" 
+                            />
+                          )}
+                        </div>
                       </td>
                       <td><InlineInput value={c.seats} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'seats', v)} /></td>
                     </tr>
