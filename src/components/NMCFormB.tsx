@@ -98,6 +98,49 @@ const StackedInput = ({ value, onChange, className = '' }: any) => {
   );
 };
 
+const MultiDoctorInput = ({ value, onChange, datalistId }: { value: string, onChange: (v: string) => void, datalistId: string }) => {
+  const [current, setCurrent] = useState('');
+  const doctors = value ? value.split('\n').filter(Boolean) : [];
+
+  const addCurrent = () => {
+    const trimmed = current.trim();
+    if (trimmed && !doctors.includes(trimmed)) {
+      onChange([...doctors, trimmed].join('\n'));
+    }
+    setCurrent('');
+  };
+
+  return (
+    <div className="flex flex-col gap-1 w-full min-w-[150px]">
+      {doctors.map(d => (
+        <div key={d} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[9.5pt] group">
+          <span className="whitespace-nowrap">{d}</span>
+          <button onClick={() => onChange(doctors.filter(x => x !== d).join('\n'))} className="no-print text-slate-400 hover:text-red-500 flex-shrink-0 ml-1">
+            <X size={12} />
+          </button>
+        </div>
+      ))}
+      <div className="flex items-center gap-1 no-print">
+        <input 
+          type="text" 
+          value={current} 
+          onChange={e => setCurrent(e.target.value)} 
+          list={datalistId}
+          placeholder="+ Add Doctor"
+          className="w-full bg-transparent border-0 border-b border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 text-[9.5pt] transition-colors"
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              addCurrent();
+            }
+          }}
+          onBlur={addCurrent}
+        />
+      </div>
+    </div>
+  );
+};
+
 const InlineTextarea = ({ value, onChange, placeholder = '', className = '', rows = 1, onBlur }: any) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const adjustHeight = () => {
@@ -1811,7 +1854,7 @@ export default function NMCFormB() {
 
               <table className="nmc-table tight-table text-[9.5pt] w-full mb-2">
                 <thead>
-                  <tr><th className="w-48 text-left pl-2">Name of the Clinic</th><th className="w-24">Weekday/s</th><th className="w-24">Timings</th><th className="w-32">Average<br/>number of<br/>cases/days</th><th className="text-left pl-2">Name of Clinic In-charge</th></tr>
+                  <tr><th className="w-[30%] text-left pl-2">Name of the Clinic</th><th className="w-[12%]">Weekday/s</th><th className="w-[12%]">Timings</th><th className="w-[12%]">Average<br/>cases/days</th><th className="w-[34%] text-left pl-2">Name of Clinic In-charge</th></tr>
                 </thead>
                 <tbody>
                   {clinics.map((c, i) => {
@@ -1835,22 +1878,22 @@ export default function NMCFormB() {
                         <td><InlineTextarea value={c.cases} onChange={(v:string)=>updateRow(setClinics, c.id, 'cases', v)} /></td>
                         {isStandard ? (
                           i === 0 ? (
-                            <td rowSpan={2} className="align-middle">
-                              <InlineInput
+                            <td rowSpan={2} className="align-middle px-1 py-1">
+                              <MultiDoctorInput
                                 value={clinics[0].incharge}
                                 onChange={(v: string) => {
                                   updateRow(setClinics, clinics[0].id, 'incharge', v);
                                   if (clinics[1]) updateRow(setClinics, clinics[1].id, 'incharge', v);
                                 }}
-                                list="doctor-names"
+                                datalistId="doctor-names"
                               />
                             </td>
                           ) : null
                         ) : (
-                          <td>
+                          <td className="px-1 py-1">
                             <div className="flex items-start gap-1">
                               <div className="flex-1">
-                                <InlineInput value={c.incharge} onChange={(v:string)=>updateRow(setClinics, c.id, 'incharge', v)} list="doctor-names" />
+                                <MultiDoctorInput value={c.incharge} onChange={(v:string)=>updateRow(setClinics, c.id, 'incharge', v)} datalistId="doctor-names" />
                               </div>
                               <button 
                                 className="no-print text-red-500 hover:text-red-700 p-1 flex items-center justify-center shrink-0"
