@@ -58,8 +58,8 @@ interface InternalExaminer { id: string; name: string; designation: string; }
 interface ExamStudent { id: string; name: string; result: string; }
 interface EligibleFaculty { id: string; designation: string; num: string; name: string; seats: string; adequate: string; }
 
-const InlineInput = ({ value, onChange, placeholder = '', className = '', onBlur }: any) => (
-  <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} onBlur={onBlur}
+const InlineInput = ({ value, onChange, placeholder = '', className = '', onBlur, list }: any) => (
+  <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} onBlur={onBlur} list={list}
     className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-bold transition-colors ${isCenteredValue(value) ? 'text-center' : ''} ${className}`} />
 );
 
@@ -1225,7 +1225,13 @@ export default function NMCFormB() {
                   {otherCourses.map(c => (
                     <tr key={c.id}>
                       <td><InlineInput value={c.name} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'name', v)} /></td>
-                      <td className="text-center"><InlineSelect value={c.permitted} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'permitted', v)} options={["Yes", "No"]} className="text-center" /></td>
+                      <td className="text-center">
+                        <InlineInput value={c.permitted} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'permitted', v)} className="text-center" list="yes-no-options" />
+                        <datalist id="yes-no-options">
+                          <option value="Yes" />
+                          <option value="No" />
+                        </datalist>
+                      </td>
                       <td><InlineInput value={c.seats} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'seats', v)} /></td>
                     </tr>
                   ))}
