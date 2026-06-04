@@ -22,13 +22,15 @@ export default function DatePickerInput({ value, onChange, className, placeholde
       <DatePicker
         selected={selectedDate}
         onChange={(date: Date | null) => {
+          let newValue = '';
           if (date) {
             const yyyy = date.getFullYear();
             const mm = String(date.getMonth() + 1).padStart(2, '0');
             const dd = String(date.getDate()).padStart(2, '0');
-            onChange(`${yyyy}-${mm}-${dd}`);
-          } else {
-            onChange('');
+            newValue = `${yyyy}-${mm}-${dd}`;
+          }
+          if (newValue !== (value || '')) {
+            onChange(newValue);
           }
         }}
         dateFormat="dd/MM/yyyy"
