@@ -2096,7 +2096,7 @@ export default function NMCFormB() {
               <span className="w-8">F.</span>
               <span>ACADEMIC ACTIVITIES:</span>
             </h4>
-            <table className="nmc-table text-[10pt] ml-8 w-[90%]">
+            <table className="nmc-table tight-table text-[10pt] ml-8 w-[90%]">
               <thead>
                 <tr><th className="w-12 text-left pl-2">S.<br/>No.</th><th className="w-64 text-left pl-2">Details</th><th className="w-32">Number in the last<br/>Year</th><th>Remarks<br/>Adequate/ Inadequate</th></tr>
               </thead>
