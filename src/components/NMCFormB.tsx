@@ -60,7 +60,7 @@ interface EligibleFaculty { id: string; designation: string; num: string; name: 
 
 const InlineInput = ({ value, onChange, placeholder = '', className = '', onBlur, list }: any) => (
   <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} onBlur={onBlur} list={list}
-    className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-bold transition-colors ${isCenteredValue(value) ? 'text-center' : ''} ${className}`} />
+    className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-normal transition-colors ${isCenteredValue(value) ? 'text-center' : ''} ${className}`} />
 );
 
 const StackedInput = ({ value, onChange, className = '' }: any) => {
@@ -161,14 +161,14 @@ const InlineTextarea = ({ value, onChange, placeholder = '', className = '', row
       placeholder={placeholder}
       rows={rows}
       onBlur={onBlur}
-      className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-bold transition-colors resize-none overflow-hidden ${isCenteredValue(value) ? 'text-center' : ''} ${className}`}
+      className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-normal transition-colors resize-none overflow-hidden ${isCenteredValue(value) ? 'text-center' : ''} ${className}`}
     />
   );
 };
 
 const InlineSelect = ({ value, onChange, options, className = '' }: any) => (
   <select value={value} onChange={e => onChange(e.target.value)}
-    className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-bold cursor-pointer transition-colors ${isCenteredValue(value) ? 'text-center' : ''} ${className}`}>
+    className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-normal cursor-pointer transition-colors ${isCenteredValue(value) ? 'text-center' : ''} ${className}`}>
     <option value="" className="font-sans font-normal text-slate-400">-- Select --</option>
     {options.map((opt: string) => (
       <option key={opt} value={opt} className="font-sans font-normal text-slate-900 bg-white">{opt}</option>
