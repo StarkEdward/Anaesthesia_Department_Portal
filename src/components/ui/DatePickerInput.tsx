@@ -12,10 +12,22 @@ interface Props {
   required?: boolean;
 }
 
+const parseLocalDate = (dateStr: string | undefined | null) => {
+  if (!dateStr) return null;
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    return new Date(year, month, day);
+  }
+  return new Date(dateStr);
+};
+
 export default function DatePickerInput({ value, onChange, className, placeholder, minDate, maxDate, required }: Props) {
-  const selectedDate = React.useMemo(() => value ? new Date(value) : null, [value]);
-  const min = React.useMemo(() => minDate ? new Date(minDate) : undefined, [minDate]);
-  const max = React.useMemo(() => maxDate ? new Date(maxDate) : undefined, [maxDate]);
+  const selectedDate = React.useMemo(() => parseLocalDate(value), [value]);
+  const min = React.useMemo(() => parseLocalDate(minDate) || undefined, [minDate]);
+  const max = React.useMemo(() => parseLocalDate(maxDate) || undefined, [maxDate]);
 
   return (
     <div className="w-full relative custom-datepicker-container">
