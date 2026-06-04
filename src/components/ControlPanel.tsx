@@ -7,6 +7,7 @@ import {
   FileText, Users, MapPin, Feather, CheckCircle, 
   Trash2, Plus, RefreshCw, Calendar, Sparkles, AlertCircle, CheckSquare, Square, Type
 } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 import { fallbackReportConfig } from '../data/fallbackData';
 
 const MarathiInput = ({ value, onChange, className, rows, multiline, enabled }: any) => {
@@ -61,6 +62,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   setUseMarathiNumerals,
   onReset
 }) => {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'meta' | 'employees' | 'college' | 'stamps' | 'fonts'>('meta');
   const [selectedDateForBulk, setSelectedDateForBulk] = useState<number>(1);
   const [selectedStatusForBulk, setSelectedStatusForBulk] = useState<AttendanceType>('H');
@@ -92,7 +94,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const handleApplyStatusToSelected = () => {
     const targetId = selectedEmployeeForBulk || (employees.length > 0 ? employees[0].id : '');
     if (!targetId) {
-      alert("Please add an employee first!");
+      showToast("Please add an employee first!", "error");
       return;
     }
     setEmployees(prev => prev.map(emp => {

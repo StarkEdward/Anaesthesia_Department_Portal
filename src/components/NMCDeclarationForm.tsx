@@ -269,7 +269,7 @@ function NMCDeclarationFormInner() {
       pdf.save(fileName.replace(/\s+/g, " "));
     } catch (error) {
       console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF. Try using the regular Print option or wait a moment and try again.");
+      setToastMessage({ text: "Failed to generate PDF. Try using the regular Print option or wait a moment and try again.", type: "error" });
     } finally {
       dateInputStates.forEach(({ el, originalValue }) => {
         el.type = "date";

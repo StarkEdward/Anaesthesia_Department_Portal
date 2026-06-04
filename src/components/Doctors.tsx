@@ -7,6 +7,7 @@ import { useToast } from "../context/ToastContext";
 import { db } from "../firebase";
 import { collection, onSnapshot, query, doc, addDoc, updateDoc, deleteDoc, orderBy } from "firebase/firestore";
 import DatePickerInput from './ui/DatePickerInput';
+import { designationHierarchy, sortDoctors } from '../lib/doctorConstants';
 
 export default function Doctors() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -201,16 +202,7 @@ export default function Doctors() {
     setIsModalOpen(true);
   };
 
-  const designationHierarchy: Record<string, number> = {
-    "Professor and Head": 1,
-    "Associate Professor": 2,
-    "Assistant Professor": 3,
-    "Senior Resident": 4,
-    "Junior Resident - 3": 5,
-    "Junior Resident - 2": 6,
-    "Junior Resident - 1": 7,
-    "Junior Resident": 8,
-  };
+
 
   const getRankColor = (rank: number) => {
     switch (rank) {
@@ -221,25 +213,6 @@ export default function Doctors() {
       case 5: return "from-slate-400 to-slate-600";
       default: return "from-slate-300 to-slate-400";
     }
-  };
-
-  const nameHierarchy: Record<string, number> = {
-    "rajesh": 1,
-    "yogesh": 1,
-    "prasad": 2,
-    "sneha": 1,
-    "gulabsing": 2,
-    "minakshi": 3,
-    "manoj": 4,
-    "prachi": 10,
-    "kalpesh": 11,
-    "sachin": 12,
-    "hanuman": 13,
-    "anjali": 14,
-    "akshita": 15,
-    "shraddha": 16,
-    "laxman": 17,
-    "mrunal": 18
   };
 
   const filteredDoctors = doctors.filter(doc => {
@@ -268,17 +241,7 @@ export default function Doctors() {
     // Support out-of-order multi-word searching (e.g. "rajesh mbbs" or "mbbs rajesh")
     const searchTerms = searchQuery.toLowerCase().split(/\s+/).filter(term => term.length > 0);
     return searchTerms.every(term => searchString.includes(term));
-  }).sort((a, b) => {
-    const rankA = designationHierarchy[a.designation] || 99;
-    const rankB = designationHierarchy[b.designation] || 99;
-    if (rankA !== rankB) return rankA - rankB;
-    
-    const nameRankA = nameHierarchy[a.first_name.toLowerCase()] || 99;
-    const nameRankB = nameHierarchy[b.first_name.toLowerCase()] || 99;
-    if (nameRankA !== nameRankB) return nameRankA - nameRankB;
-
-    return a.first_name.localeCompare(b.first_name);
-  });
+  }).sort(sortDoctors);
 
   const handleExportCSV = () => {
     import('papaparse').then((Papa) => {

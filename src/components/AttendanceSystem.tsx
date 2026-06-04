@@ -13,9 +13,11 @@ import {
   Printer, Download, Eye, ZoomIn, ZoomOut, RotateCcw, 
   HelpCircle, ChevronRight, ChevronLeft, SlidersHorizontal, Check, X, FileText, Globe, Info, Feather, Home, PanelLeftClose
 } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export default function AttendanceSystem() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [currentView, setCurrentView] = useState<'landing' | 'doctors' | 'residents' | 'clerks'>('landing');
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const [config, setConfig] = useState<ReportConfig>(fallbackReportConfig);
@@ -145,14 +147,14 @@ export default function AttendanceSystem() {
       window.print();
     } catch (e) {
       console.error(e);
-      alert('Printing is not supported in this preview iframe. Please use the Download PDF button or open the app in a new tab.');
+      showToast('Printing is not supported in this preview iframe. Please use the Download PDF button or open the app in a new tab.', 'error');
     }
   };
 
   const handleDownloadPDFClick = async () => {
     const el = document.getElementById('print-area');
     if (!el) {
-      alert('Print area not found');
+      showToast('Print area not found', 'error');
       return;
     }
     
@@ -174,7 +176,7 @@ export default function AttendanceSystem() {
 
       const printPages = el.querySelectorAll('.print-page');
       if (printPages.length === 0) {
-        alert('No pages found to print.');
+        showToast('No pages found to print.', 'error');
         return;
       }
 
@@ -214,7 +216,7 @@ export default function AttendanceSystem() {
       el.parentElement!.style.transform = currentTransform;
     } catch (err: any) {
       console.error(err);
-      alert(`Error generating PDF: ${err.message || err}`);
+      showToast(`Error generating PDF: ${err.message || err}`, 'error');
     } finally {
       console.error = originalConsoleError;
     }

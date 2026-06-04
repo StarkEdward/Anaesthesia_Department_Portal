@@ -4,6 +4,7 @@ import { Plus, FileText, Search, Loader2, Trash2, AlertTriangle, X } from 'lucid
 import { db } from '../firebase';
 import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
+import { useToast } from '../context/ToastContext';
 
 interface FormBRecord {
   id: string;
@@ -17,6 +18,7 @@ interface FormBRecord {
 
 export default function NMCFormBHub() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [records, setRecords] = useState<FormBRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,7 +50,7 @@ export default function NMCFormBHub() {
       setDeleteConfirmId(null);
     } catch (error) {
       console.error("Error deleting record:", error);
-      alert("Failed to delete record.");
+      showToast("Failed to delete record.", "error");
     } finally {
       setIsDeleting(false);
     }

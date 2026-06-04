@@ -5,6 +5,8 @@ import { Printer, Download, Plus, Trash2, Users, X, Search, ListPlus, Save, Arro
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
+import { sortDoctors, designationHierarchy, nameHierarchy } from '../lib/doctorConstants';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -224,6 +226,7 @@ const renderFormattedItemText = (text: string) => {
 };
 
 export default function NMCFormB() {
+  const { showToast } = useToast();
   const printRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
@@ -774,10 +777,11 @@ export default function NMCFormB() {
       if (!id) {
         navigate(`/nmc-form-b/${recordId}`, { replace: true });
       }
-      alert('Record saved successfully!');
+      setLastSaved(new Date().toLocaleString());
+      showToast('Record saved successfully!', 'success');
     } catch (err: any) {
       console.error(err);
-      alert('Failed to save record: ' + err.message);
+      showToast('Failed to save record: ' + err.message, 'error');
     } finally {
       setIsSaving(false);
     }
@@ -864,7 +868,7 @@ export default function NMCFormB() {
       document.body.removeChild(tempContainer);
     } catch (err: any) {
       console.error(err);
-      alert(`Error generating PDF: ${err.message || err}`);
+      showToast(`Error generating PDF: ${err.message || err}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -897,7 +901,7 @@ export default function NMCFormB() {
   const pn = (base: number) => base + extraFacultyPages;
 
   // ── Import from Doctors (Firebase) ────────────────────────────────
-  const [showDoctorModal, setShowDoctorModal] = useState(false);
+  const [importTarget, setImportTarget] = useState<'faculty' | 'pgStudying' | 'pgCompleted' | null>(null);
   const [rowDoctorModalId, setRowDoctorModalId] = useState<string | null>(null);
   const [rowSelectedDoctorIds, setRowSelectedDoctorIds] = useState<Set<string>>(new Set());
   const [firestoreDoctors, setFirestoreDoctors] = useState<any[]>([]);
@@ -905,66 +909,81 @@ export default function NMCFormB() {
   const [selectedDoctorIds, setSelectedDoctorIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!showDoctorModal) return;
+    if (!importTarget) return;
     const q = query(collection(db, 'doctors'), orderBy('first_name'));
     const unsub = onSnapshot(q, snap => {
       setFirestoreDoctors(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
     return () => unsub();
-  }, [showDoctorModal]);
+  }, [importTarget]);
 
-  const DESIG_RANK: Record<string, number> = {
-    'Professor and Head':  1,
-    'Associate Professor': 2,
-    'Assistant Professor': 3,
-    'Senior Resident':     4,
-    'Junior Resident - 3': 5,
-    'Junior Resident - 2': 6,
-    'Junior Resident - 1': 7,
-    'Junior Resident':     8,
-  };
   const filteredFirestoreDoctors = firestoreDoctors
     .filter(d => {
+      if (importTarget === 'pgStudying' || importTarget === 'pgCompleted') {
+        const desig = d.designation || '';
+        const isJRorSR = desig === 'Senior Resident' || desig.startsWith('Junior Resident');
+        if (!isJRorSR) return false;
+      }
       const q = doctorSearch.toLowerCase();
       return !q || `${d.first_name} ${d.middle_name || ''} ${d.last_name} ${d.designation}`.toLowerCase().includes(q);
     })
-    .sort((a, b) => {
-      const ra = DESIG_RANK[a.designation] ?? 99;
-      const rb = DESIG_RANK[b.designation] ?? 99;
-      if (ra !== rb) return ra - rb;
-      // Within same designation, sort alphabetically by first name
-      return (a.first_name || '').localeCompare(b.first_name || '');
-    });
+    .sort(sortDoctors);
 
   const handleImportDoctors = () => {
-    // Import in the same sorted order as displayed in the modal (rank order)
     const sortedSelected = filteredFirestoreDoctors.filter(d => selectedDoctorIds.has(d.id));
-    const newRows: UnitFaculty[] = sortedSelected.map(d => ({
-      id: generateId(),
-      designation: d.designation || '',
-      name: `${d.title || 'Dr.'} ${d.first_name || ''} ${d.middle_name || ''} ${d.last_name || ''}`.replace(/\s+/g, ' ').trim(),
-      joiningDate: d.joining_date ? d.joining_date.split('-').reverse().join('-') : '',
-      relieved: d.till_date ? 'Relieved' : 'Working',
-      relievingDate: d.till_date ? d.till_date.split('-').reverse().join('-') : '',
-      attendance: '',
-      phone: d.mobile_number || '',
-      email: d.email || '',
-      signature: '',
-    }));
-    setUnitFaculties(prev => {
-      // Remove old blank placeholder rows first, then add real data
-      const nonEmpty = prev.filter(r => r.name || r.designation || r.phone || r.email);
-      const combined = [...nonEmpty, ...newRows];
-      return combined.sort((a, b) => {
-        const ra = DESIG_RANK[a.designation] ?? 99;
-        const rb = DESIG_RANK[b.designation] ?? 99;
-        if (ra !== rb) return ra - rb;
-        // Within same designation, sort alphabetically by name
-        return (a.name || '').localeCompare(b.name || '');
+    
+    if (importTarget === 'faculty') {
+      const newRows: UnitFaculty[] = sortedSelected.map(d => ({
+        id: generateId(),
+        designation: d.designation || '',
+        name: `${d.title || 'Dr.'} ${d.first_name || ''} ${d.middle_name || ''} ${d.last_name || ''}`.replace(/\s+/g, ' ').trim(),
+        joiningDate: d.joining_date ? d.joining_date.split('-').reverse().join('-') : '',
+        relieved: d.till_date ? 'Relieved' : 'Working',
+        relievingDate: d.till_date ? d.till_date.split('-').reverse().join('-') : '',
+        attendance: '',
+        phone: d.mobile_number || '',
+        email: d.email || '',
+        signature: '',
+      }));
+      setUnitFaculties(prev => {
+        const nonEmpty = prev.filter(r => r.name || r.designation || r.phone || r.email);
+        const combined = [...nonEmpty, ...newRows];
+        return combined.sort((a, b) => {
+          const ra = designationHierarchy[a.designation] ?? 99;
+          const rb = designationHierarchy[b.designation] ?? 99;
+          if (ra !== rb) return ra - rb;
+          
+          const cleanNameA = (a.name || '').replace(/^(Dr\.|Mr\.|Mrs\.)\s*/i, '');
+          const cleanNameB = (b.name || '').replace(/^(Dr\.|Mr\.|Mrs\.)\s*/i, '');
+          const firstNameA = cleanNameA.split(' ')[0] || '';
+          const firstNameB = cleanNameB.split(' ')[0] || '';
+          
+          const nameRankA = nameHierarchy[firstNameA.toLowerCase()] || 99;
+          const nameRankB = nameHierarchy[firstNameB.toLowerCase()] || 99;
+          if (nameRankA !== nameRankB) return nameRankA - nameRankB;
+
+          return (a.name || '').localeCompare(b.name || '');
+        });
       });
-    });
+    } else if (importTarget === 'pgStudying' || importTarget === 'pgCompleted') {
+      const newRows = sortedSelected.map(d => ({
+        id: generateId(),
+        name: `${d.title || 'Dr.'} ${d.first_name || ''} ${d.middle_name || ''} ${d.last_name || ''}`.replace(/\s+/g, ' ').trim(),
+        joiningDate: d.joining_date ? d.joining_date.split('-').reverse().join('-') : '',
+        relievingDate: d.till_date ? d.till_date.split('-').reverse().join('-') : '',
+        phone: d.mobile_number || '',
+        email: d.email || ''
+      }));
+      
+      if (importTarget === 'pgStudying') {
+        setPgStudents(prev => [...prev.filter(r => r.name || r.phone || r.email), ...newRows.map(r => ({id: r.id, name: r.name, joiningDate: r.joiningDate, phone: r.phone, email: r.email}))]);
+      } else {
+        setPastPgStudents(prev => [...prev.filter(r => r.name || r.phone || r.email), ...newRows]);
+      }
+    }
+
     setSelectedDoctorIds(new Set());
-    setShowDoctorModal(false);
+    setImportTarget(null);
   };
 
   if (isFetching) {
@@ -1916,7 +1935,7 @@ export default function NMCFormB() {
                     </button>
                     <button
                       className="text-emerald-600 hover:text-emerald-800 text-sm flex items-center gap-1 border border-emerald-300 rounded px-2 py-0.5"
-                      onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setShowDoctorModal(true); }}
+                      onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('faculty'); }}
                     >
                       <Users className="w-4 h-4"/> Import from Doctors
                     </button>
@@ -2026,7 +2045,14 @@ export default function NMCFormB() {
                 ))}
               </tbody>
             </table>
-            <button className="no-print text-indigo-600 text-sm mb-6 ml-8 flex items-center -mt-4" onClick={()=>addRow(setPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', phone:'', email:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+            <div className="flex items-center gap-4 mb-6 ml-8 mt-2">
+              <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', phone:'', email:''}))}>
+                <Plus className="w-4 h-4 mr-1"/> Add Record
+              </button>
+              <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgStudying'); }}>
+                <Users className="w-4 h-4 mr-1"/> Import from Doctors
+              </button>
+            </div>
 
             <p className="font-bold mb-2 flex pl-8">
               <span className="w-8">iv.</span>
@@ -2057,7 +2083,14 @@ export default function NMCFormB() {
                 ))}
               </tbody>
             </table>
-            <button className="no-print text-indigo-600 text-sm mb-6 ml-8 flex items-center -mt-4" onClick={()=>addRow(setPastPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', relievingDate:'', phone:'', email:''}))}><Plus className="w-4 h-4 mr-1"/> Add Record</button>
+            <div className="flex items-center gap-4 mb-8 ml-8 mt-2">
+              <button className="no-print text-indigo-600 text-sm flex items-center" onClick={()=>addRow(setPastPgStudents, ()=>({id:generateId(), name:'', joiningDate:'', relievingDate:'', phone:'', email:''}))}>
+                <Plus className="w-4 h-4 mr-1"/> Add Record
+              </button>
+              <button className="no-print text-emerald-600 text-sm flex items-center border border-emerald-300 rounded px-2 py-0.5" onClick={() => { setDoctorSearch(''); setSelectedDoctorIds(new Set()); setImportTarget('pgCompleted'); }}>
+                <Users className="w-4 h-4 mr-1"/> Import from Doctors
+              </button>
+            </div>
 
             <h4 className="font-bold text-[12pt] mb-4 flex pl-8">
               <span className="w-8">F.</span>
@@ -2323,7 +2356,7 @@ export default function NMCFormB() {
         </div>
 
         {/* ── Doctor Import Modal ──────────────────────────────────────── */}
-        {showDoctorModal && (
+        {importTarget && (
           <div className="no-print fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-[600px] max-h-[80vh] flex flex-col overflow-hidden">
               {/* Header */}
@@ -2332,9 +2365,11 @@ export default function NMCFormB() {
                   <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <Users className="w-5 h-5 text-emerald-600" /> Import from Doctors
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Select doctors/SRs to auto-fill in the faculty table</p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {importTarget === 'faculty' ? 'Select doctors/SRs to auto-fill in the faculty table' : 'Select Junior/Senior Residents'}
+                  </p>
                 </div>
-                <button onClick={() => setShowDoctorModal(false)} className="text-slate-400 hover:text-slate-700 transition-colors">
+                <button onClick={() => setImportTarget(null)} className="text-slate-400 hover:text-slate-700 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -2418,7 +2453,7 @@ export default function NMCFormB() {
               {/* Footer */}
               <div className="px-6 py-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50">
                 <button
-                  onClick={() => setShowDoctorModal(false)}
+                  onClick={() => setImportTarget(null)}
                   className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 border border-slate-200 rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
