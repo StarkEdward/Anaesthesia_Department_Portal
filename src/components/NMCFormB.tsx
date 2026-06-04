@@ -1107,43 +1107,43 @@ export default function NMCFormB() {
               <div className="flex items-end">
                 <span className="w-8">a.</span>
                 <span className="mr-2 whitespace-nowrap">Date of LoP when PG course was first Permitted:</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.lopDate} onChange={(v:string)=>setGenDetails({...genDetails, lopDate: v})} /></span>
+                <span className="border-b border-black w-64"><InlineInput value={genDetails.lopDate} onChange={(v:string)=>setGenDetails({...genDetails, lopDate: v})} /></span>
               </div>
               <div className="flex items-end">
                 <span className="w-8">b.</span>
                 <span className="mr-2 whitespace-nowrap">Number of years since start of PG course:</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.yearsSince} onChange={(v:string)=>setGenDetails({...genDetails, yearsSince: v})} /></span>
+                <span className="border-b border-black w-64"><InlineInput value={genDetails.yearsSince} onChange={(v:string)=>setGenDetails({...genDetails, yearsSince: v})} /></span>
               </div>
               <div className="flex items-end">
                 <span className="w-8">c.</span>
                 <span className="mr-2 whitespace-nowrap">Name of the Head of Department:</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.hod} onChange={(v:string)=>setGenDetails({...genDetails, hod: v})} /></span>
+                <span className="border-b border-black w-96"><InlineInput value={genDetails.hod} onChange={(v:string)=>setGenDetails({...genDetails, hod: v})} /></span>
               </div>
               <div className="flex items-end">
                 <span className="w-8">d.</span>
                 <span className="mr-2 whitespace-nowrap">Number of PG Admissions (Seats):</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.seats} onChange={(v:string)=>setGenDetails({...genDetails, seats: v})} /></span>
+                <span className="border-b border-black w-32"><InlineInput value={genDetails.seats} onChange={(v:string)=>setGenDetails({...genDetails, seats: v})} /></span>
               </div>
               <div className="flex items-end">
                 <span className="w-8">e.</span>
                 <span className="mr-2 whitespace-nowrap">Number of Increase of Admissions (Seats) applied for:</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.increaseApplied} onChange={(v:string)=>setGenDetails({...genDetails, increaseApplied: v})} /></span>
+                <span className="border-b border-black w-32"><InlineInput value={genDetails.increaseApplied} onChange={(v:string)=>setGenDetails({...genDetails, increaseApplied: v})} /></span>
               </div>
               <div className="flex items-end">
                 <span className="w-8">f.</span>
                 <span className="mr-2 whitespace-nowrap">Total number of Units:</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.units} onChange={(v:string)=>setGenDetails({...genDetails, units: v})} /></span>
+                <span className="border-b border-black w-32"><InlineInput value={genDetails.units} onChange={(v:string)=>setGenDetails({...genDetails, units: v})} /></span>
               </div>
               <div className="flex items-end">
                 <span className="w-8">g.</span>
                 <span className="mr-2 whitespace-nowrap">Number of beds in the Department:</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.beds} onChange={(v:string)=>setGenDetails({...genDetails, beds: v})} /></span>
+                <span className="border-b border-black w-32"><InlineInput value={genDetails.beds} onChange={(v:string)=>setGenDetails({...genDetails, beds: v})} /></span>
               </div>
               <div className="flex flex-col mt-1.5">
                 <div className="flex items-end mb-1">
                   <span className="w-8">h.</span>
                   <span className="mr-2 whitespace-nowrap">Number of Units with beds in each unit:</span>
-                  <span className="border-b border-black flex-1"><InlineInput value={genDetails.numUnitsBeds || ''} onChange={(v:string)=>setGenDetails({...genDetails, numUnitsBeds: v})} /></span>
+                  <span className="border-b border-black w-96"><InlineInput value={genDetails.numUnitsBeds || ''} onChange={(v:string)=>setGenDetails({...genDetails, numUnitsBeds: v})} /></span>
                 </div>
                 <table className="nmc-table tight-table w-full text-[10pt] ml-8 w-[calc(100%-2rem)] mb-0">
                   <thead>
@@ -1163,7 +1163,7 @@ export default function NMCFormB() {
               <div className="flex items-end mb-1">
                 <span className="w-8">i.</span>
                 <span className="mr-2 whitespace-nowrap">Details of PG inspections of the department in last five years:</span>
-                <span className="border-b border-black flex-1"><InlineInput value={genDetails.pgInspectionsText || ''} onChange={(v:string)=>setGenDetails({...genDetails, pgInspectionsText: v})} /></span>
+                <span className="border-b border-black w-[500px]"><InlineInput value={genDetails.pgInspectionsText || ''} onChange={(v:string)=>setGenDetails({...genDetails, pgInspectionsText: v})} /></span>
               </div>
               <table className="nmc-table tight-table text-[8.5pt] leading-[1.2] w-full">
                 <thead>
@@ -2261,7 +2261,7 @@ export default function NMCFormB() {
               <div className="flex-1">
                 <div className="flex mb-1">
                   <span className="w-56 whitespace-nowrap">Details of the Examination:</span>
-                  <span className="border-b border-black w-64 flex-1 mr-8"><InlineInput value={examDetails} onChange={setExamDetails} /></span>
+                  <span className="border-b border-black w-96 mr-8"><InlineInput value={examDetails} onChange={setExamDetails} /></span>
                 </div>
                 <div className="font-normal text-[11pt]">Insert video clip (5 minutes) and photographs (ten).</div>
               </div>
