@@ -233,6 +233,8 @@ export default function NMCFormB() {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [isFetching, setIsFetching] = useState(!!id);
+  const [isAutosaving, setIsAutosaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const useAutoSaveState = <T,>(key: string, initialValue: T) => {
     const [state, setState] = useState<T>(() => {
@@ -759,6 +761,42 @@ export default function NMCFormB() {
     loadRecord();
   }, [id]);
 
+  useEffect(() => {
+    if (isFetching) return;
+
+    const payloadString = JSON.stringify({
+      genDetails, unitBeds, pgInspections, otherCourses, infra, opdAreas, journals, equipments, icus, icuEquips, otherIcuEquips, hduEquips, otherHduEquips, clinics, clinicalMats, unitFaculties, staffUnitNo, eligibleFaculties, pgStudents, pastPgStudents, academicActivities, publicationsList, formativeAssessment, externalExaminers, internalExaminers, examStudents, examDetails, assessorRemarks, miscData
+    });
+
+    const timeoutId = setTimeout(async () => {
+      setIsAutosaving(true);
+      try {
+        const recordId = id || Math.random().toString(36).substring(2, 10);
+        const docRef = doc(db, 'nmc_form_b', recordId);
+        
+        const payload = {
+          id: recordId,
+          ...JSON.parse(payloadString),
+          updatedAt: serverTimestamp(),
+          ...(id ? {} : { createdAt: serverTimestamp() })
+        };
+        
+        await setDoc(docRef, payload, { merge: true });
+        setLastSaved(new Date());
+        
+        if (!id) {
+          navigate(`/nmc-form-b/${recordId}`, { replace: true });
+        }
+      } catch (error) {
+        console.error("Autosave error: ", error);
+      } finally {
+        setIsAutosaving(false);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [id, isFetching, navigate, genDetails, unitBeds, pgInspections, otherCourses, infra, opdAreas, journals, equipments, icus, icuEquips, otherIcuEquips, hduEquips, otherHduEquips, clinics, clinicalMats, unitFaculties, staffUnitNo, eligibleFaculties, pgStudents, pastPgStudents, academicActivities, publicationsList, formativeAssessment, externalExaminers, internalExaminers, examStudents, examDetails, assessorRemarks, miscData]);
+
   const handleSaveRecord = async () => {
     setIsSaving(true);
     try {
@@ -1021,7 +1059,15 @@ export default function NMCFormB() {
                 NMC FORM B - Anaesthesiology {id ? '(Editing)' : '(New)'}
               </h1>
             </div>
-            <p className="text-sm text-slate-500 ml-11">Auto-saves locally. Use Save Record to persist to cloud.</p>
+              <p className="text-sm text-slate-500 ml-11">
+                {isAutosaving ? (
+                  <span className="flex items-center gap-1 text-blue-600"><Loader2 size={12} className="animate-spin" /> Saving to cloud...</span>
+                ) : lastSaved ? (
+                  <span className="text-emerald-600">All changes saved to cloud at {lastSaved.toLocaleTimeString()}</span>
+                ) : (
+                  <span>Auto-saves to cloud automatically. Use Save Record to force save.</span>
+                )}
+              </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
@@ -1225,26 +1271,8 @@ export default function NMCFormB() {
                   {otherCourses.map(c => (
                     <tr key={c.id}>
                       <td><InlineInput value={c.name} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'name', v)} /></td>
-                      <td className="text-center align-top pt-1">
-                        <div className="flex flex-col items-center gap-1">
-                          <InlineSelect 
-                            value={(c.permitted === 'Yes' || c.permitted === 'No' || c.permitted === '') ? c.permitted : 'Other'} 
-                            onChange={(v:string) => {
-                              if (v === 'Other') updateRow(setOtherCourses, c.id, 'permitted', ' ');
-                              else updateRow(setOtherCourses, c.id, 'permitted', v);
-                            }} 
-                            options={["Yes", "No", "Other"]} 
-                            className="text-center" 
-                          />
-                          {c.permitted !== 'Yes' && c.permitted !== 'No' && c.permitted !== '' && (
-                            <InlineInput 
-                              value={c.permitted.trim() === '' ? '' : c.permitted} 
-                              onChange={(v:string) => updateRow(setOtherCourses, c.id, 'permitted', v || ' ')} 
-                              placeholder="Please specify" 
-                              className="text-center text-sm !border-b !border-slate-300 w-full" 
-                            />
-                          )}
-                        </div>
+                      <td className="text-center">
+                        <InlineInput value={c.permitted} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'permitted', v)} className="text-center" />
                       </td>
                       <td><InlineInput value={c.seats} onChange={(v:string)=>updateRow(setOtherCourses, c.id, 'seats', v)} /></td>
                     </tr>
