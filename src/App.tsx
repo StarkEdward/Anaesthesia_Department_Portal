@@ -15,6 +15,9 @@ import Doctors from './components/Doctors';
 import NMCDeclarationForm from './components/NMCDeclarationForm';
 import NMCDeclarationHub from './components/NMCDeclarationHub';
 
+import NMCFormA from './components/NMCFormA';
+import NMCFormAHub from './components/NMCFormAHub';
+
 import NMCFormB from './components/NMCFormB';
 import NMCFormBHub from './components/NMCFormBHub';
 import Inventory from './components/Inventory';
@@ -94,7 +97,7 @@ export default function App() {
               <Route path="/leave" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><LeaveApplication /></MainLayout></ProtectedRoute>} />
               <Route path="/official-leave" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><OfficialLeaveLetter /></MainLayout></ProtectedRoute>} />
               
-              <Route path="/nmc-form-b" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormBHub /></MainLayout></ProtectedRoute>} />
+              <Route path="/nmc-form-a" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormAHub /></MainLayout></ProtectedRoute>} />`n              <Route path="/nmc-form-a/new" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormA /></MainLayout></ProtectedRoute>} />`n              <Route path="/nmc-form-a/:id" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormA /></MainLayout></ProtectedRoute>} />`n`n              <Route path="/nmc-form-b" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormBHub /></MainLayout></ProtectedRoute>} />
               <Route path="/nmc-form-b/new" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormB /></MainLayout></ProtectedRoute>} />
               <Route path="/nmc-form-b/:id" element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'clerk']}><MainLayout><NMCFormB /></MainLayout></ProtectedRoute>} />
               
@@ -111,3 +114,4 @@ export default function App() {
     </LanguageProvider>
   );
 }
+
