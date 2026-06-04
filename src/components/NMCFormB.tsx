@@ -1393,7 +1393,7 @@ export default function NMCFormB() {
                             className="text-center"
                           />
                         </td>
-                        <td><InlineInput value={j.available} onChange={(v:string)=>updateRow(setJournals, j.id, 'available', v)} /></td>
+                        <td className="text-center"><InlineInput value={j.available} onChange={(v:string)=>updateRow(setJournals, j.id, 'available', v)} className="text-center" /></td>
                         <td className="no-print text-center">
                           <button 
                             className="text-red-500 hover:text-red-700 p-1 flex items-center justify-center w-full h-full"
