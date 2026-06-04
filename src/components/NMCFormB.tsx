@@ -1342,7 +1342,7 @@ export default function NMCFormB() {
                   </tbody>
                 </table>
                 <div className="flex mb-1 mt-2"><span className="w-28">Waiting area:</span><span className="border-b border-black w-32"><InlineInput value={infra.waitingArea} onChange={(v:string)=>setInfra({...infra, waitingArea: v})} onBlur={() => setInfra({...infra, waitingArea: formatAreaOnBlur(infra.waitingArea)})} /></span></div>
-                <div className="flex mb-1"><span className="w-44">Space and arrangements:</span><span className="flex-1 font-bold"><InlineSelect value={infra.spaceAdequate} onChange={(v:string)=>setInfra({...infra, spaceAdequate: v})} options={["Adequate", "Not Adequate"]} /></span></div>
+                <div className="flex mb-1"><span className="w-44">Space and arrangements:</span><span className="flex-1 font-bold"><InlineSelect value={infra.spaceAdequate} onChange={(v:string)=>setInfra({...infra, spaceAdequate: v})} options={["Adequate", "Not Adequate", "--"]} /></span></div>
                 <div className="flex mb-3"><span className="w-80">If not adequate, give reasons/details/comments:</span><span className="border-b border-black flex-1"><InlineTextarea value={infra.spaceReason} onChange={(v:string)=>setInfra({...infra, spaceReason: v})} /></span></div>
               </div>
 
@@ -1351,22 +1351,22 @@ export default function NMCFormB() {
                 <table className="nmc-table tight-table text-[10pt] mb-3">
                   <thead><tr><th colSpan={2}>Department Office</th></tr></thead>
                   <tbody>
-                    <tr><td className="w-1/2">Department office</td><td><InlineSelect value={infra.officeDept} onChange={(v:string)=>setInfra({...infra, officeDept: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Staff (Steno /Clerk)</td><td><InlineSelect value={infra.officeStaff} onChange={(v:string)=>setInfra({...infra, officeStaff: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Computer and related office<br/>equipment</td><td><InlineSelect value={infra.officeComputer} onChange={(v:string)=>setInfra({...infra, officeComputer: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Storage space for files</td><td><InlineSelect value={infra.officeStorage} onChange={(v:string)=>setInfra({...infra, officeStorage: v})} options={["Available", "Not Available"]} /></td></tr>
+                    <tr><td className="w-1/2">Department office</td><td><InlineSelect value={infra.officeDept} onChange={(v:string)=>setInfra({...infra, officeDept: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Staff (Steno /Clerk)</td><td><InlineSelect value={infra.officeStaff} onChange={(v:string)=>setInfra({...infra, officeStaff: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Computer and related office<br/>equipment</td><td><InlineSelect value={infra.officeComputer} onChange={(v:string)=>setInfra({...infra, officeComputer: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Storage space for files</td><td><InlineSelect value={infra.officeStorage} onChange={(v:string)=>setInfra({...infra, officeStorage: v})} options={["Available", "Not Available", "--"]} /></td></tr>
                   </tbody>
                 </table>
                 <table className="nmc-table tight-table text-[10pt] mb-0">
                   <thead><tr><th colSpan={2}>Office Space for Teaching Faculty/residents</th></tr></thead>
                   <tbody>
-                    <tr><td className="w-1/2">Faculty</td><td><InlineSelect value={infra.officeFaculty} onChange={(v:string)=>setInfra({...infra, officeFaculty: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Head of the Department</td><td><InlineSelect value={infra.officeHod} onChange={(v:string)=>setInfra({...infra, officeHod: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Professors</td><td><InlineSelect value={infra.officeProf} onChange={(v:string)=>setInfra({...infra, officeProf: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Associate Professors</td><td><InlineSelect value={infra.officeAssoc} onChange={(v:string)=>setInfra({...infra, officeAssoc: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Assistant Professor</td><td><InlineSelect value={infra.officeAsst} onChange={(v:string)=>setInfra({...infra, officeAsst: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>Senior residents rest room</td><td><InlineSelect value={infra.srRestRoom} onChange={(v:string)=>setInfra({...infra, srRestRoom: v})} options={["Available", "Not Available"]} /></td></tr>
-                    <tr><td>PG rest room</td><td><InlineSelect value={infra.pgRestRoom} onChange={(v:string)=>setInfra({...infra, pgRestRoom: v})} options={["Available", "Not Available"]} /></td></tr>
+                    <tr><td className="w-1/2">Faculty</td><td><InlineSelect value={infra.officeFaculty} onChange={(v:string)=>setInfra({...infra, officeFaculty: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Head of the Department</td><td><InlineSelect value={infra.officeHod} onChange={(v:string)=>setInfra({...infra, officeHod: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Professors</td><td><InlineSelect value={infra.officeProf} onChange={(v:string)=>setInfra({...infra, officeProf: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Associate Professors</td><td><InlineSelect value={infra.officeAssoc} onChange={(v:string)=>setInfra({...infra, officeAssoc: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Assistant Professor</td><td><InlineSelect value={infra.officeAsst} onChange={(v:string)=>setInfra({...infra, officeAsst: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>Senior residents rest room</td><td><InlineSelect value={infra.srRestRoom} onChange={(v:string)=>setInfra({...infra, srRestRoom: v})} options={["Available", "Not Available", "--"]} /></td></tr>
+                    <tr><td>PG rest room</td><td><InlineSelect value={infra.pgRestRoom} onChange={(v:string)=>setInfra({...infra, pgRestRoom: v})} options={["Available", "Not Available", "--"]} /></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1380,8 +1380,8 @@ export default function NMCFormB() {
             <div className="pl-8 mt-3 text-[10.5pt]">
               <p className="font-bold mb-1 flex"><span className="w-8">c.</span><span>Seminar room</span></p>
               <div className="pl-8 mb-4">
-                <div className="flex mb-1"><span className="w-36">Space and facility:</span><span className="w-64"><InlineSelect value={infra.seminarSpace} onChange={(v:string)=>setInfra({...infra, seminarSpace: v})} options={["Adequate", "Not Adequate"]} /></span></div>
-                <div className="flex mb-1"><span className="w-36">Internet facility:</span><span className="w-64"><InlineSelect value={infra.internet} onChange={(v:string)=>setInfra({...infra, internet: v})} options={["Available", "Not Available"]} /></span></div>
+                <div className="flex mb-1"><span className="w-36">Space and facility:</span><span className="w-64"><InlineSelect value={infra.seminarSpace} onChange={(v:string)=>setInfra({...infra, seminarSpace: v})} options={["Adequate", "Not Adequate", "--"]} /></span></div>
+                <div className="flex mb-1"><span className="w-36">Internet facility:</span><span className="w-64"><InlineSelect value={infra.internet} onChange={(v:string)=>setInfra({...infra, internet: v})} options={["Available", "Not Available", "--"]} /></span></div>
                 <div className="flex mb-1"><span className="w-56">Audiovisual equipment details:</span><span className="flex-1 border-b border-transparent hover:border-slate-300"><InlineInput value={infra.audioVisual} onChange={(v:string)=>setInfra({...infra, audioVisual: v})} /></span></div>
               </div>
 
@@ -1583,7 +1583,7 @@ export default function NMCFormB() {
                           )}
                         </td>
                         <td className="font-bold text-center"><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'num', v)} /></td>
-                        <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                        <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'available', v)} options={["Available", "Not Available", "--"]} /></td>
                         <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setIcuEquips, eq.id, 'functional', v)} /></td>
                         <td>
                           {isStandard ? (
@@ -1631,7 +1631,7 @@ export default function NMCFormB() {
                           )}
                         </td>
                         <td><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'num', v)} /></td>
-                        <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                        <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'available', v)} options={["Available", "Not Available", "--"]} /></td>
                         <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setOtherIcuEquips, eq.id, 'functional', v)} /></td>
                         <td>
                           {isStandard ? (
@@ -1715,7 +1715,7 @@ export default function NMCFormB() {
                             )}
                           </td>
                           <td className="font-bold text-center"><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'num', v)} /></td>
-                          <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                          <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'available', v)} options={["Available", "Not Available", "--"]} /></td>
                           <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setHduEquips, eq.id, 'functional', v)} /></td>
                           <td>
                             {isStandard ? (
@@ -1759,7 +1759,7 @@ export default function NMCFormB() {
                       <tr key={eq.id}>
                         <td className="whitespace-pre-wrap">{renderFormattedItemText(eq.item)}</td>
                         <td><InlineTextarea value={eq.num} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'num', v)} /></td>
-                        <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'available', v)} options={["Available", "Not Available"]} /></td>
+                        <td><InlineSelect value={eq.available} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'available', v)} options={["Available", "Not Available", "--"]} /></td>
                         <td><InlineTextarea value={eq.functional} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'functional', v)} /></td>
                         <td><InlineTextarea value={eq.remarks} onChange={(v:string)=>updateRow(setOtherHduEquips, eq.id, 'remarks', v)} /></td>
                       </tr>
