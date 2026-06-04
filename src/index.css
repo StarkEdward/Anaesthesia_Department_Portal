@@ -51,6 +51,16 @@
   }
 }
 
+/* Hide input underlines specifically during PDF generation (which clones DOM and uses html2canvas) */
+body.is-generating-pdf input.border-b.border-black,
+body.is-generating-pdf span.border-b.border-black,
+body.is-generating-pdf div.h-10.border-b.border-black,
+.print-container-clone input.border-b.border-black,
+.print-container-clone span.border-b.border-black,
+.print-container-clone div.h-10.border-b.border-black {
+  border-bottom-color: transparent !important;
+}
+
 /* Custom global overrides for custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
