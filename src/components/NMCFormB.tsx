@@ -63,6 +63,41 @@ const InlineInput = ({ value, onChange, placeholder = '', className = '', onBlur
     className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-bold transition-colors ${isCenteredValue(value) ? 'text-center' : ''} ${className}`} />
 );
 
+const StackedInput = ({ value, onChange, className = '' }: any) => {
+  let top = value || '';
+  let bottom = '';
+  if (value && typeof value === 'string') {
+    if (value.includes('\n')) {
+      const parts = value.split('\n');
+      top = parts[0];
+      bottom = parts.slice(1).join('\n');
+    } else {
+      const match = value.match(/^(.+?)\s+(\(.+?\))$/);
+      if (match) {
+        top = match[1];
+        bottom = match[2];
+      }
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-0 w-full">
+      <input 
+        type="text" 
+        value={top} 
+        onChange={e => onChange(bottom ? `${e.target.value}\n${bottom}` : e.target.value)} 
+        className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-bold transition-colors text-center ${className}`} 
+      />
+      <input 
+        type="text" 
+        value={bottom} 
+        onChange={e => onChange(top ? `${top}\n${e.target.value}` : `\n${e.target.value}`)} 
+        className={`w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:ring-0 px-1 py-0.5 font-bold transition-colors text-center ${className}`} 
+      />
+    </div>
+  );
+};
+
 const InlineTextarea = ({ value, onChange, placeholder = '', className = '', rows = 1, onBlur }: any) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const adjustHeight = () => {
@@ -1515,11 +1550,11 @@ export default function NMCFormB() {
                   {icus.map(icu => (
                     <tr key={icu.id}>
                       <td><InlineInput value={icu.name} onChange={(v:string)=>updateRow(setIcus, icu.id, 'name', v)} /></td>
-                      <td className="text-center"><InlineTextarea value={icu.beds} onChange={(v:string)=>updateRow(setIcus, icu.id, 'beds', v)} className="text-center" /></td>
-                      <td className="text-center"><InlineTextarea value={icu.occDay} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occDay', v)} className="text-center" /></td>
-                      <td className="text-center"><InlineTextarea value={icu.occYr1} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr1', v)} className="text-center" /></td>
-                      <td className="text-center"><InlineTextarea value={icu.occYr2} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr2', v)} className="text-center" /></td>
-                      <td className="text-center"><InlineTextarea value={icu.occYr3} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr3', v)} className="text-center" /></td>
+                      <td className="text-center"><StackedInput value={icu.beds} onChange={(v:string)=>updateRow(setIcus, icu.id, 'beds', v)} className="text-center" /></td>
+                      <td className="text-center"><StackedInput value={icu.occDay} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occDay', v)} className="text-center" /></td>
+                      <td className="text-center"><StackedInput value={icu.occYr1} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr1', v)} className="text-center" /></td>
+                      <td className="text-center"><StackedInput value={icu.occYr2} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr2', v)} className="text-center" /></td>
+                      <td className="text-center"><StackedInput value={icu.occYr3} onChange={(v:string)=>updateRow(setIcus, icu.id, 'occYr3', v)} className="text-center" /></td>
                     </tr>
                   ))}
                 </tbody>
